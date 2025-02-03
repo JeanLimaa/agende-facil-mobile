@@ -1,18 +1,14 @@
-import { router } from 'expo-router';
 import React from 'react';
 import { View, Text, StyleSheet, Button } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/modules/auth/contexts/AuthContext';
 
 const HomeScreen = () => {
-    function logOff() {
-        AsyncStorage.removeItem('auth_token');
-        router.push('/auth');
-    };
+    const { logout } = useAuth();
     
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Welcome to AgendeFacil!!!</Text>
-            <Button title="Login" onPress={logOff} />
+            <Button title="Logout" onPress={logout} />
         </View>
     );
 };
