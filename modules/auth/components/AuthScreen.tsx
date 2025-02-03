@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { TouchableOpacity, View, Text, Image } from "react-native";
 import { styles } from "../styles/styles";
 import {  usePathname, router } from "expo-router";

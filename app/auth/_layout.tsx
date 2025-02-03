@@ -1,5 +1,5 @@
 import { useAuth } from "@/modules/auth/contexts/AuthContext";
-import { Redirect, Stack, useSegments } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 
 function AuthStack(){
     return (
