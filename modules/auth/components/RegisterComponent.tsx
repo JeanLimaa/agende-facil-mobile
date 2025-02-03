@@ -29,6 +29,9 @@ export function RegisterComponent() {
       }
       
       Alert.alert('Cadastro realizado', 'Usuário cadastrado com sucesso!');
+
+      const responseData: {access_token: string} = await response.json();
+      login(responseData.access_token);
     } catch (error: Error | any) {
       setErrorMessage('Erro ao cadastrar usuário. Tente novamente mais tarde.');
     }
