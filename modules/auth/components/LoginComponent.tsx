@@ -1,10 +1,10 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Link, router } from "expo-router";
+import { Link } from "expo-router";
 import { useState } from "react";
 import { TextInput, Text, Button } from "react-native";
 import { styles } from "../styles/styles";
 import React from "react";
 import { useAuth } from "@/modules/auth/contexts/AuthContext";
+import { BASE_URL } from "@/constants/apiUrl";
 
 export function LoginComponent() {
   const { login } = useAuth();
@@ -18,16 +18,16 @@ export function LoginComponent() {
       setErrorMessage('O email e a senha são obrigatórios');
       return;
     }
-
+    
     try {
-      const response = await fetch('http://localhost:3000/auth/login', {
+      const response = await fetch(`${BASE_URL}/auth/login`, {
         body: JSON.stringify(loginData),
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       });
-console.log(response)
+      
       if(!response.ok){
         const errorData = await response.json();
         setErrorMessage(errorData.message);

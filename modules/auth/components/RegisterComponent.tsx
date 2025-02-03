@@ -1,11 +1,12 @@
-
 import React, { useState } from 'react';
 import { Text, TextInput, Button, Alert } from 'react-native';
 import { IRegisterData } from '../interfaces/register.interface';
 import { IErrorDefault } from '../interfaces/error.interface';
 import { styles } from '../styles/styles';
-
+import { BASE_URL } from "@/constants/apiUrl";
+import { useAuth } from '../contexts/AuthContext';
 export function RegisterComponent() {
+  const { login } = useAuth();
   const [data, setData] = useState<IRegisterData>({ email: '', password: '', phone: '', name: '' });
   const [errorMessage, setErrorMessage] = useState<string>();
 
@@ -13,7 +14,7 @@ export function RegisterComponent() {
     setErrorMessage('');
 
     try {
-      const response = await fetch('http://localhost:3000/auth/register', {
+      const response = await fetch(`${BASE_URL}/auth/register`, {
         body: JSON.stringify(data),
         method: 'POST',
         headers: {
@@ -28,8 +29,6 @@ export function RegisterComponent() {
       }
       
       Alert.alert('Cadastro realizado', 'Usuário cadastrado com sucesso!');
-      console.log(response)
-      //router.push('/auth/login');
     } catch (error: Error | any) {
       setErrorMessage('Erro ao cadastrar usuário. Tente novamente mais tarde.');
     }
