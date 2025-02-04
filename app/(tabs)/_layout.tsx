@@ -6,6 +6,8 @@ export default function TabsLayout(){
         <ProtectRoute>
             <Stack screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="index" />
+                <Stack.Screen name="schedule" />
+                <Stack.Screen name="new-schedule"/>
             </Stack>
         </ProtectRoute>
     )
