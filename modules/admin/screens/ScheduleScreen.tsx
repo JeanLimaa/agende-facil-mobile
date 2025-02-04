@@ -5,23 +5,41 @@ import { Calendar } from "react-native-calendars";
 import { router } from "expo-router";
 import { styles } from "../styles/styles";
 
-const appointments = [
+interface IAppointment {
+  id: string;
+  date: string;
+  timeStart: string;
+  timeEnd: string;
+  client: string;
+  appointmentStatus: string;
+  price: string;
+}
+
+const appointments: IAppointment[] = [
   { id: "1", date: "2025-01-01", timeStart: "15:00", timeEnd: "15:30", client: "Cliente 1", appointmentStatus: "Pago", price: "R$ 100,00" },
   { id: "2", date: "2025-01-01", timeStart: "16:00", timeEnd: "16:30", client: "Cliente 2", appointmentStatus: "Pendente", price: "R$ 150,00" },
   { id: "3", date: "2025-01-02", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
-  { id: "4", date: "2025-02-04", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
+  { id: "4", date: "2025-02-03", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
 ];
 
-// Função para agrupar os agendamentos por data
-const groupByDate = (appointments: any[]) => {
-  return appointments.reduce((acc, appointment) => {
-    const date = appointment.date; // uma string como "2025-01-01"
+// Função para agrupar os agendamentos por data E ordenamente do mais recente para o mais antigo
+const groupByDate = (appointments: IAppointment[]): { [key: string]: IAppointment[] } => {
+  const grouped = appointments.reduce((acc, appointment) => {
+    const date = appointment.date; // "YYYY-MM-DD"
     if (!acc[date]) {
       acc[date] = [];
     }
     acc[date].push(appointment);
     return acc;
-  }, {});
+  }, {} as Record<string, IAppointment[]>);
+
+  // Ordena as chaves por data
+  const sortedEntries = Object.entries(grouped).sort(([dateA], [dateB]) => 
+    new Date(dateB).getTime() - new Date(dateA).getTime()
+  );
+  
+  // Reconstrói o objeto ordenado
+  return Object.fromEntries(sortedEntries);
 };
 
 export function ScheduleScreen() {
@@ -44,7 +62,6 @@ export function ScheduleScreen() {
   const groupedAppointments = groupByDate(filteredAppointments);
   const dates = Object.keys(groupedAppointments);
   
-console.log(groupedAppointments)
   return (
     <View style={styles.container}>
       {/* Barra superior */}
@@ -107,7 +124,17 @@ console.log(groupedAppointments)
             ))}
           </View>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum agendamento encontrado.</Text>}
+        ListEmptyComponent={(
+          <Text style={styles.emptyText}>
+            {
+              showAll
+              ? "Nenhum agendamento encontrado."
+              : selectedDate === new Date().toISOString().split("T")[0]
+              ? "Nenhum agendamento encontrado para hoje."
+              : `Nenhum agendamento encontrado para o dia ${new Date(selectedDate).toLocaleDateString("pt-BR")}.`
+            }
+          </Text>
+        )}
       />
       </View>
 
