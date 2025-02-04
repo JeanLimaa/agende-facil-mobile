@@ -7,6 +7,7 @@ import { useAuth } from "@/modules/auth/contexts/AuthContext";
 import { BASE_URL } from "@/constants/apiUrl";
 import {Entypo, Feather} from '@expo/vector-icons/';
 import { InputIconContainer } from "./InputIconContainer";
+import { Colors } from "@/constants/Colors";
 
 export function LoginComponent() {
   const { login } = useAuth();
@@ -69,7 +70,7 @@ export function LoginComponent() {
         />
       </InputIconContainer>
       
-      <Button title="Entrar" onPress={handleLogin} />
+      <Button color={Colors.light.mainColor} title="Entrar" onPress={handleLogin} />
       
       <Link style={styles.forgotPassText} href={"/auth/forgot-password"}>Esqueceu a senha?</Link>
     </>

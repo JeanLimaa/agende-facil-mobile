@@ -7,6 +7,7 @@ import { BASE_URL } from "@/constants/apiUrl";
 import { useAuth } from '../contexts/AuthContext';
 import { InputIconContainer } from './InputIconContainer';
 import { Entypo, Feather } from '@expo/vector-icons';
+import { Colors } from '@/constants/Colors';
 export function RegisterComponent() {
   const { login } = useAuth();
   const [data, setData] = useState<IRegisterData>({ email: '', password: '', phone: '', name: '' });
@@ -86,7 +87,7 @@ export function RegisterComponent() {
         />
       </InputIconContainer>
 
-      <Button title="Cadastrar" onPress={() => handleRegister(data)} />
+      <Button color={Colors.light.mainColor} title="Cadastrar" onPress={() => handleRegister(data)} />
     </>
   )
 }
