@@ -5,6 +5,8 @@ import { styles } from "../styles/styles";
 import React from "react";
 import { useAuth } from "@/modules/auth/contexts/AuthContext";
 import { BASE_URL } from "@/constants/apiUrl";
+import {Entypo, Feather} from '@expo/vector-icons/';
+import { InputIconContainer } from "./InputIconContainer";
 
 export function LoginComponent() {
   const { login } = useAuth();
@@ -45,24 +47,31 @@ export function LoginComponent() {
     <>
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        value={loginData.email}
-        onChangeText={(email) => setLoginData(prev => ({...prev, email}))}
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={loginData.password}
-        onChangeText={(password) => setLoginData(prev => ({...prev, password}))}
-        secureTextEntry
-      />
-      <Button title="Entrar" onPress={handleLogin} />
+      <InputIconContainer>
+        <Entypo name="email" size={20} />
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          value={loginData.email}
+          onChangeText={(email) => setLoginData(prev => ({...prev, email}))}
+          keyboardType="email-address"
+        />
+      </InputIconContainer>
 
+      <InputIconContainer>
+        <Feather name="lock" size={20} />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          value={loginData.password}
+          onChangeText={(password) => setLoginData(prev => ({...prev, password}))}
+          secureTextEntry
+        />
+      </InputIconContainer>
       
-      <Link href={"/auth/forgot-password"}>Esqueceu a senha?</Link>
+      <Button title="Entrar" onPress={handleLogin} />
+      
+      <Link style={styles.forgotPassText} href={"/auth/forgot-password"}>Esqueceu a senha?</Link>
     </>
   )
 }

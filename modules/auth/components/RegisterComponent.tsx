@@ -5,6 +5,8 @@ import { IErrorDefault } from '../interfaces/error.interface';
 import { styles } from '../styles/styles';
 import { BASE_URL } from "@/constants/apiUrl";
 import { useAuth } from '../contexts/AuthContext';
+import { InputIconContainer } from './InputIconContainer';
+import { Entypo, Feather } from '@expo/vector-icons';
 export function RegisterComponent() {
   const { login } = useAuth();
   const [data, setData] = useState<IRegisterData>({ email: '', password: '', phone: '', name: '' });
@@ -41,37 +43,48 @@ export function RegisterComponent() {
     <>
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nome da Empresa"
-        value={data.name}
-        onChangeText={(name) => setData(prev => ({...prev, name}))}
+      <InputIconContainer>
+        <Feather name="user" size={20} />
+        <TextInput
+          style={styles.input}
+          placeholder="Nome da Empresa"
+          value={data.name}
+          onChangeText={(name) => setData(prev => ({...prev, name}))}
+        />
+      </InputIconContainer>
 
-      />
+      <InputIconContainer>
+        <Entypo name="email" size={20} />
+        <TextInput
+          style={styles.input}
+          placeholder="E-mail"
+          value={data.email}
+          onChangeText={(email) => setData(prev => ({...prev, email}))}
+          keyboardType="email-address"
+        />
+      </InputIconContainer>
 
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        value={data.email}
-        onChangeText={(email) => setData(prev => ({...prev, email}))}
-        keyboardType="email-address"
-      />
+      <InputIconContainer>
+        <Feather name="lock" size={20} />
+        <TextInput
+          style={styles.input}
+          placeholder="Senha"
+          value={data.password}
+          onChangeText={(password) => setData(prev => ({...prev, password}))}
+          secureTextEntry
+        />
+      </InputIconContainer>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        value={data.password}
-        onChangeText={(password) => setData(prev => ({...prev, password}))}
-        secureTextEntry
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Telefone/Celular"
-        value={data.phone}
-        onChangeText={(phone) => setData(prev => ({...prev, phone}))}
-        keyboardType='phone-pad'
-      />
+      <InputIconContainer>
+        <Feather name="phone" size={24} />
+        <TextInput
+          style={styles.input}
+          placeholder="Telefone/Celular"
+          value={data.phone}
+          onChangeText={(phone) => setData(prev => ({...prev, phone}))}
+          keyboardType='phone-pad'
+        />
+      </InputIconContainer>
 
       <Button title="Cadastrar" onPress={() => handleRegister(data)} />
     </>
