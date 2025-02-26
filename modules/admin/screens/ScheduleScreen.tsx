@@ -132,7 +132,7 @@ export function ScheduleScreen() {
       </View>
 
       {/* Botão Flutuante de Adicionar */}
-      <FAB style={styles.fab} icon="plus" onPress={() => router.push("/(tabs)/new-schedule")} />
+      <FAB style={styles.fab} icon="plus" onPress={() => router.push("/(tabs)/schedule/new-schedule")} />
     </View>
   );
 }

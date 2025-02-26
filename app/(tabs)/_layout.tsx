@@ -14,7 +14,7 @@ function StackNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="DrawerScreens" component={DrawerNavigator} />
-      <Stack.Screen name="new-schedule" component={NewSchedulePage} />
+      <Stack.Screen name="schedule/new-schedule" component={NewSchedulePage} />
     </Stack.Navigator>
   );
 }
