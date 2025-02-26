@@ -2,7 +2,7 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from ".";
 import SchedulePage from "./schedule";
-import NewSchedulePage from "./new-schedule";
+import NewSchedulePage from "./schedule/new-schedule";
 import { Appbar } from "react-native-paper";
 import { Header } from "@/components/Header/Header";
 import { ProtectRoute } from "@/components/ProtectRoute";
