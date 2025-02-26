@@ -64,13 +64,6 @@ export function ScheduleScreen() {
   
   return (
     <View style={styles.container}>
-      {/* Barra superior */}
-      <Appbar.Header style={styles.header}>
-        <Appbar.Action icon="menu" onPress={() => {}} />
-        <Appbar.Content title="Agenda" />
-        <Appbar.Action icon="filter" onPress={() => {}} />
-      </Appbar.Header>
-
       {/* Botão de Mostrar/Ocultar Calendário */}
       <TouchableOpacity onPress={() => setIsCalendarExpanded(!isCalendarExpanded)} style={styles.toggleButton}>
         <Text style={styles.toggleButtonText}>{isCalendarExpanded ? "Ocultar Calendário" : "Mostrar Calendário"}</Text>
