@@ -18,6 +18,12 @@ interface Service {
   categoryId: number;
 }
 
+interface Client {
+  id: number;
+  name: string;
+}
+
+
 export function NewScheduleScreen() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(new Date());
@@ -25,14 +31,20 @@ export function NewScheduleScreen() {
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<number>();
-  const [clients] = useState(["Cliente 1", "Cliente 2", "Cliente 3"]);
-  const [selectedClient, setSelectedClient] = useState("");
+  const [clients] = useState<Client[]>([
+    {id: 1, name: "Cliente 1"},
+    {id: 2, name: "Cliente 2"},
+    {id: 3, name: "Cliente 3"},
+  ]);
+  const [selectedClient, setSelectedClient] = useState<Client>();
   const [services, setServices] = useState<Service[]>([]);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
   const [categories, setCategories] = useState<number[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number>();
   const [showDialog, setShowDialog] = useState(false);
   const [menuVisible, setMenuVisible] = useState({ employee: false, client: false, category: false });
+
+  const [inputWidth, setInputWidth] = useState(0);
 
   // Mock de fetch de funcionários
   useEffect(() => {
@@ -98,12 +110,13 @@ export function NewScheduleScreen() {
         <Appbar.Content title="Novo Agendamento" />
       </Appbar.Header>
 
-      {/* Seleção de Funcionário */}
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={styles.sectionLabel}>Funcionário</Text>
-
+        {/* Seleção de Funcionário */}
         <View style={styles.sectionContainer}>
+          <Text style={styles.sectionLabel}>Funcionário</Text>
+
           <Menu
+            style={{width: inputWidth}}
             visible={menuVisible.employee}
             onDismiss={() => setMenuVisible({ ...menuVisible, employee: false })}
             anchor={
@@ -136,20 +149,22 @@ export function NewScheduleScreen() {
 
           <Menu
             visible={menuVisible.client}
+            style={{width: inputWidth}}
             onDismiss={() => setMenuVisible({ ...menuVisible, client: false })}
             anchor={
               <Button 
                 onPress={() => setMenuVisible({ ...menuVisible, client: true })}
                 mode="outlined"
                 style={styles.input}
+                onLayout={(event) => setInputWidth(event.nativeEvent.layout.width)}
               >
-                {selectedClient || "Selecione o cliente"}
+                {selectedClient?.name || "Selecione o cliente"}
               </Button>
             }>
             {clients.map(client => (
               <Menu.Item
-                key={client}
-                title={client}
+                key={client.id}
+                title={client.name}
                 onPress={() => {
                   setSelectedClient(client);
                   setMenuVisible({ ...menuVisible, client: false });
@@ -164,22 +179,28 @@ export function NewScheduleScreen() {
           <Text style={styles.sectionLabel}>Data e Horário</Text>
 
           <View style={styles.row}>
-            <TouchableOpacity onPress={() => setShowDatePicker(true)} activeOpacity={0.8}  >
+            <TouchableOpacity 
+              onPress={() => setShowDatePicker(true)} 
+              activeOpacity={0.8}
+              style={styles.flex}
+            >
               <TextInput
                 label="Data"
                 value={date.split('-').reverse().join('/')}
                 right={<TextInput.Icon icon="calendar" onPress={() => setShowDatePicker(true)} />}
-                style={{width: '100%'}}
                 editable={false}
               />
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => setShowTimePicker(true)} activeOpacity={0.8} >
+            <TouchableOpacity 
+              onPress={() => setShowTimePicker(true)} 
+              activeOpacity={0.8}
+              style={styles.flex}
+            >
               <TextInput
               label="Horário"
               value={time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
               right={<TextInput.Icon icon="clock" onPress={() => setShowTimePicker(true)} />}
-              style={{width: '100%'}}
               editable={false}
               />
             </TouchableOpacity>
