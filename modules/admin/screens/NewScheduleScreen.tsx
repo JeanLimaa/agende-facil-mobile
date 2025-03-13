@@ -9,6 +9,7 @@ import { BASE_URL } from "@/constants/apiUrl";
 import api from "@/services/apiService";
 import { Axios, AxiosError } from "axios";
 import { textCapitalize } from "@/helpers/textCapitalize";
+import { formatToCurrency } from "@/helpers/formatValue";
 
 interface Employee {
   id: number;
@@ -273,7 +274,7 @@ export function NewScheduleScreen() {
                   />
                   <View style={styles.serviceInfo}>
                     <Text>{service.name}</Text>
-                    <Text>R$ {service.price.toFixed(2)}</Text>
+                    <Text>{formatToCurrency(service.price)}</Text>
                   </View>
                 </View>
                 <Divider />
@@ -289,7 +290,7 @@ export function NewScheduleScreen() {
 
         <View>
           <Text style={styles.sectionLabel}>Valor Total</Text>
-          <Text style={styles.sectionLabel}>R$ {totalPrice.toFixed(2)}</Text>
+          <Text style={styles.sectionLabel}>{formatToCurrency(totalPrice)}</Text>
         </View>
 
         <Button 
