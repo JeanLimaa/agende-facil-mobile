@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from "react-native";
-import { Appbar, TextInput, Button, Dialog, Portal, Chip, Checkbox, Divider, Menu } from "react-native-paper";
+import { Appbar, TextInput, Button, Dialog, Portal, Chip, Checkbox, Divider, Menu, Modal } from "react-native-paper";
 import { Calendar, DateData } from "react-native-calendars";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { router } from "expo-router";
 import { Colors } from "@/constants/Colors";
+import { BASE_URL } from "@/constants/apiUrl";
+import api from "@/services/apiService";
+import { Axios, AxiosError } from "axios";
+import { textCapitalize } from "@/helpers/textCapitalize";
 
 interface Employee {
   id: number;
@@ -23,6 +27,11 @@ interface Client {
   name: string;
 }
 
+interface Category {
+  id: number;
+  name: string;
+  description?: string;
+}
 
 export function NewScheduleScreen() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -39,8 +48,8 @@ export function NewScheduleScreen() {
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [services, setServices] = useState<Service[]>([]);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
-  const [categories, setCategories] = useState<number[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number>();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>();
   const [showDialog, setShowDialog] = useState(false);
   const [menuVisible, setMenuVisible] = useState({ employee: false, client: false, category: false });
 
@@ -48,28 +57,45 @@ export function NewScheduleScreen() {
 
   // Mock de fetch de funcionários
   useEffect(() => {
-    // Substituir por chamada real à API
-    const fakeEmployees = [
-      { id: 1, name: "Funcionário 1" },
-      { id: 2, name: "Funcionário 2" }
-    ];
-    setEmployees(fakeEmployees);
-    if (fakeEmployees.length > 0) {
-      setSelectedEmployee(fakeEmployees[0].id);
-    }
+    const fetchEmployees = async () => {
+      try {
+        const response = await api.get(`/employee/list/all`);
+        setEmployees(response.data);
+        
+        if (!(response.data.length > 0)) {
+          setShowDialog(true);
+          return;
+        };
+
+        setSelectedEmployee(response.data[0].id);
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          console.error(error?.response?.data);
+        }
+      }
+    };
+
+    fetchEmployees();
   }, []);
 
   // Mock de fetch de serviços quando funcionário é selecionado
   useEffect(() => {
     if (selectedEmployee) {
-      // Substituir por chamada real à API
-      const fakeServices = [
-        { id: 1, name: "Corte", price: 50, categoryId: 1 },
-        { id: 2, name: "Barba", price: 30, categoryId: 1 },
-        { id: 3, name: "Massagem", price: 80, categoryId: 2 }
-      ];
-      setServices(fakeServices);
-      setCategories([...new Set(fakeServices.map(s => s.categoryId))]);
+      const fetchData = async () => {
+        try {
+          const categorysResponse = await api.get(`/category/list-all`);
+          setCategories(categorysResponse.data);
+
+          const servicesResponse = await api.get(`/service/list-all`);
+          setServices(servicesResponse.data)
+        } catch (error) {
+          if (error instanceof AxiosError) {
+            console.error(error?.response?.data);
+          }
+        }
+      };
+
+      fetchData();
     }
   }, [selectedEmployee]);
 
@@ -102,6 +128,8 @@ export function NewScheduleScreen() {
         : [...prev, serviceId]
     );
   };
+
+  const filteredServices = services.filter(s => !selectedCategoryId || s.categoryId === selectedCategoryId);
 
   return (
     <View style={styles.container}>
@@ -211,24 +239,31 @@ export function NewScheduleScreen() {
           <Text style={styles.sectionLabel}>Serviços</Text>
 
           {/* Filtro de Categoria */}
-          <View style={styles.chipContainer}>
-            {categories.map(category => (
-              <Chip
-                key={category}
-                selected={selectedCategory === category}
-                onPress={() => setSelectedCategory(
-                  selectedCategory === category ? undefined : category
-                )}
-                style={styles.chip}
-              >
-                Categoria {category}
-              </Chip>
-            ))}
+          <View>
+            <Text style={styles.smallLabel}>Filtrar por categoria</Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              style={styles.chipContainer}
+            >
+              {categories.map(category => (
+                <Chip
+                  key={category.id}
+                  selected={selectedCategoryId === category.id}
+                  onPress={() => setSelectedCategoryId(
+                    selectedCategoryId === category.id ? undefined : category.id
+                  )}
+                  style={styles.chip}
+                >
+                  {textCapitalize(category.name)}
+                </Chip>
+              ))}
+            </ScrollView>
           </View>
 
           {/* Lista de Serviços */}
-          {services
-            .filter(s => !selectedCategory || s.categoryId === selectedCategory)
+          {services.length === 0 ? <Text style={styles.mediumLabel}>Nenhum serviço encontrado</Text> : 
+            filteredServices
             .map(service => (
               <View key={service.id}>
                 <View style={styles.serviceItem}>
@@ -243,7 +278,11 @@ export function NewScheduleScreen() {
                 </View>
                 <Divider />
               </View>
-            ))}
+          ))}
+          {services.length > 0 && filteredServices.length === 0 ? 
+            <Text style={styles.mediumLabel}>Não há serviços cadastrados para essa categoria.</Text> 
+          : null}
+            
         </View>
 
         <Divider />
@@ -263,19 +302,25 @@ export function NewScheduleScreen() {
       </ScrollView>
 
       {/* Date Picker */}
-      <Portal >
-        <Dialog visible={showDatePicker} onDismiss={() => setShowDatePicker(false)} >
-          <Dialog.Content>
-            <Calendar
-              onDayPress={(day: DateData) => {
-                setDate(day.dateString);
-                setShowDatePicker(false);
-              }}
-              markedDates={{ [date]: { selected: true } }}
-            />
-          </Dialog.Content>
-        </Dialog>
+      <Portal>
+        <Modal
+          visible={showDatePicker}
+          onDismiss={() => setShowDatePicker(false)}
+          style={{margin: 10}}
+        >
+          <Calendar
+            onDayPress={(day: DateData) => {
+              setDate(day.dateString);
+              setShowDatePicker(false);
+            }}
+            markedDates={{ [date]: { selected: true } }}
+            style={{
+              borderRadius: 10,
+            }}
+          />
+        </Modal>
       </Portal>
+
 
       {/* Time Picker */}
       {showTimePicker && (
@@ -358,8 +403,21 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 14,
-    fontWeight: "bold",
+    fontWeight: "700",
     margin: 5,
     color: Colors.light.textSecondary
   },
+  smallLabel: {
+    fontSize: 12,
+    marginHorizontal: 5,
+    marginBottom: 5,
+    color: Colors.light.textSecondary
+  },
+  mediumLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginHorizontal: 5,
+    marginBottom: 5,
+    color: Colors.light.textSecondary
+  }
 });
