@@ -6,8 +6,11 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string) => void;
   logout: () => void;
+  getToken: () => Promise<string | null>;
 }
 
+
+export const AuthToken = "auth_token";
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -18,7 +21,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     //SplashScreen.preventAutoHideAsync();
     
     const checkAuth = async () => {
-      const token = await AsyncStorage.getItem("auth_token");
+      const token = await AsyncStorage.getItem(AuthToken);
       setIsAuthenticated(!!token);
       setLoading(false);
       await SplashScreen.hideAsync();
@@ -28,17 +31,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (token: string) => {
-    await AsyncStorage.setItem("auth_token", token);
+    await AsyncStorage.setItem(AuthToken, token);
     setIsAuthenticated(true);
   };
 
   const logout = async () => {
-    await AsyncStorage.removeItem("auth_token");
+    await AsyncStorage.removeItem(AuthToken);
     setIsAuthenticated(false);
   };
 
+  const getToken = async () => {
+    return await AsyncStorage.getItem(AuthToken);
+  };
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout, getToken }}>
       {!loading && children}
     </AuthContext.Provider>
   );
