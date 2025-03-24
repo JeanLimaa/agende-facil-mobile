@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from "react-native";
 import { Appbar, TextInput, Button, Dialog, Portal, Chip, Checkbox, Divider, Menu, Modal } from "react-native-paper";
 import { Calendar, DateData } from "react-native-calendars";
@@ -7,7 +7,7 @@ import { router } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { BASE_URL } from "@/constants/apiUrl";
 import api from "@/services/apiService";
-import { Axios, AxiosError } from "axios";
+import { Axios, AxiosError, AxiosResponse } from "axios";
 import { textCapitalize } from "@/helpers/textCapitalize";
 import { formatToCurrency } from "@/helpers/formatValue";
 
@@ -49,14 +49,23 @@ export function NewScheduleScreen() {
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [services, setServices] = useState<Service[]>([]);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>();
+  const [categories, setCategories] = useState<Category[]>([{
+    id: 0,
+    name: "Todas",
+  }]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(0);
   const [showDialog, setShowDialog] = useState(false);
   const [menuVisible, setMenuVisible] = useState({ employee: false, client: false, category: false });
 
   const [inputWidth, setInputWidth] = useState(0);
 
-  // Mock de fetch de funcionários
+  const [discount, setDiscount] = useState(0);
+  const subTotalPrice = useMemo(() => {
+    return services.filter(s => selectedServices.includes(s.id))
+    .reduce((sum, service) => sum + service.price, 0);
+  }, [selectedServices, services]);
+  const totalPrice = (subTotalPrice - discount) >= 0 ? subTotalPrice - discount : 0;
+  
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -84,8 +93,12 @@ export function NewScheduleScreen() {
     if (selectedEmployee) {
       const fetchData = async () => {
         try {
-          const categorysResponse = await api.get(`/category/list-all`);
-          setCategories(categorysResponse.data);
+          const categorysResponse: AxiosResponse<Category[]> = await api.get(`/category/list-all`);
+          const allCategories = {
+            id: 0,
+            name: "Todas",
+          };
+          setCategories([allCategories, ...categorysResponse.data]);
 
           const servicesResponse = await api.get(`/service/list-all`);
           setServices(servicesResponse.data)
@@ -100,24 +113,23 @@ export function NewScheduleScreen() {
     }
   }, [selectedEmployee]);
 
-  const totalPrice = services
-    .filter(s => selectedServices.includes(s.id))
-    .reduce((sum, service) => sum + service.price, 0);
-
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!date || !time || !selectedEmployee || !selectedClient || selectedServices.length === 0) {
       setShowDialog(true);
       return;
     }
 
-    console.log({
-      date,
-      time,
-      employee: selectedEmployee,
-      client: selectedClient,
-      services: selectedServices,
-      totalPrice
-    });
+    try {
+      await api.post('/appointment', {
+        serviceId: selectedServices,
+        employeeId: selectedEmployee,
+        date: `${date}T${time.toISOString().split('T')[1]}`,
+      });
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        console.error(error?.response?.data);
+      }
+    };
 
     router.back();
   };
@@ -252,9 +264,9 @@ export function NewScheduleScreen() {
                   key={category.id}
                   selected={selectedCategoryId === category.id}
                   onPress={() => setSelectedCategoryId(
-                    selectedCategoryId === category.id ? undefined : category.id
+                    selectedCategoryId === category.id ? 0 : category.id
                   )}
-                  style={styles.chip}
+                  style={[styles.chip, selectedCategoryId === category.id && styles.chipSelected]}
                 >
                   {textCapitalize(category.name)}
                 </Chip>
@@ -288,9 +300,25 @@ export function NewScheduleScreen() {
 
         <Divider />
 
-        <View>
-          <Text style={styles.sectionLabel}>Valor Total</Text>
-          <Text style={styles.sectionLabel}>{formatToCurrency(totalPrice)}</Text>
+        <View style={styles.sectionContainer}>
+          <Text style={styles.sectionLabel}>Resumo</Text>
+{/*           <View>
+            <Text style={styles.sectionLabel}>SubTotal</Text>
+            <Text style={styles.sectionLabel}>{formatToCurrency(totalPrice)}</Text>
+          </View>
+          <View>
+            <Text style={styles.sectionLabel}>Desconto</Text>
+            <TextInput
+              keyboardType="numeric"
+              style={styles.input}
+              value={discount.toString()}
+              onChangeText={(value) => setDiscount(Number(value.replace(/\D/g, '')))}
+            />
+          </View> */}
+          <View>
+            <Text style={styles.sectionSubLabel}>Valor Total</Text>
+            <Text style={styles.sectionSubLabel}>{formatToCurrency(totalPrice)}</Text>
+          </View>
         </View>
 
         <Button 
@@ -384,6 +412,9 @@ const styles = StyleSheet.create({
   chip: {
     margin: 2,
   },
+  chipSelected: {
+    backgroundColor: Colors.light.mainColor,
+  },
   serviceItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -405,6 +436,12 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 14,
     fontWeight: "700",
+    margin: 5,
+    color: Colors.light.textSecondary
+  },
+  sectionSubLabel: {
+    fontSize: 13,
+    fontWeight: "500",
     margin: 5,
     color: Colors.light.textSecondary
   },
