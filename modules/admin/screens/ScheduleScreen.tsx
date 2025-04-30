@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { View, FlatList, StyleSheet, TouchableOpacity } from "react-native";
-import { Appbar, FAB, Card, Text, Switch } from "react-native-paper";
+import { View, FlatList,  TouchableOpacity } from "react-native";
+import { FAB, Card, Text, Switch } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import { router } from "expo-router";
 import { styles } from "../styles/styles";
+import { ActionsModal } from "@/components/ActionsModal";
 
 interface IAppointment {
   id: string;
@@ -19,7 +20,7 @@ const appointments: IAppointment[] = [
   { id: "1", date: "2025-01-01", timeStart: "15:00", timeEnd: "15:30", client: "Cliente 1", appointmentStatus: "Pago", price: "R$ 100,00" },
   { id: "2", date: "2025-01-01", timeStart: "16:00", timeEnd: "16:30", client: "Cliente 2", appointmentStatus: "Pendente", price: "R$ 150,00" },
   { id: "3", date: "2025-01-02", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
-  { id: "4", date: "2025-02-03", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
+  { id: "4", date: "2025-04-29", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
 ];
 
 // Função para agrupar os agendamentos por data E ordenamente do mais recente para o mais antigo
@@ -46,6 +47,40 @@ export function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
   const [showAll, setShowAll] = useState(false);
+
+  const [selectedAppointment, setSelectedAppointment] = useState<IAppointment | null>(null);
+
+  function openModal(appointment: IAppointment) {
+    setSelectedAppointment(appointment);
+  }
+
+  function closeModal() {
+    setSelectedAppointment(null);
+  }
+
+  function handleEdit() {
+    console.log("Editando agendamento:", selectedAppointment);
+    router.push({ 
+      pathname: "/(tabs)/schedule/new-schedule", 
+      params: {
+        selectedAppointment: JSON.stringify(selectedAppointment),
+      },
+    });
+    closeModal();
+  }
+
+  function handleCancel() {
+    // implementar o cancelamento e notificação real
+    alert("Agendamento cancelado e cliente notificado.");
+    closeModal();
+  }
+
+  function toggleAttended() {
+    // mudar status do agendamento para atendido;
+
+    closeModal();
+  }
+
 
   function handleShowAll() {
     setShowAll(!showAll);
@@ -102,18 +137,24 @@ export function ScheduleScreen() {
             </Text>
 
             {groupedAppointments[date].map((item: any) => (
-              <Card key={item.id} style={styles.card}>
-                <Card.Content>
-                  <View style={styles.cardRow}>
-                    <Text style={styles.clientName}>{item.client}</Text>
-                    <Text style={styles.appointmentStatus}>{item.appointmentStatus}</Text>
-                  </View>
-                  <View style={styles.cardRow}>
-                    <Text>{`${item.timeStart} - ${item.timeEnd}`}</Text>
-                    <Text style={styles.price}>{item.price}</Text>
-                  </View>
-                </Card.Content>
-              </Card>
+              <Card
+              key={item.id}
+              style={[
+                styles.card,
+              ]}
+              onPress={() => openModal(item)}
+            >
+              <Card.Content>
+                <View style={styles.cardRow}>
+                  <Text style={styles.clientName}>{item.client}</Text>
+                  <Text style={styles.appointmentStatus}>{item.appointmentStatus}</Text>
+                </View>
+                <View style={styles.cardRow}>
+                  <Text>{`${item.timeStart} - ${item.timeEnd}`}</Text>
+                  <Text style={styles.price}>{item.price}</Text>
+                </View>
+              </Card.Content>
+            </Card>
             ))}
           </View>
         )}
@@ -133,6 +174,19 @@ export function ScheduleScreen() {
 
       {/* Botão Flutuante de Adicionar */}
       <FAB style={styles.fab} icon="plus" onPress={() => router.push("/(tabs)/schedule/new-schedule")} />
+
+      <ActionsModal 
+        visible={!!selectedAppointment} 
+        onClose={closeModal} 
+        title="Ações do Agendamento"
+        options={[
+          { label: "Editar", action: handleEdit, icon: {name: "edit"}  },
+          { label: "Cancelar", action: handleCancel, icon: {name: "cancel"} },
+          { label: "Marcar como Atendido", action: toggleAttended, icon: {name: "check-circle"} },
+        ]}
+      />
     </View>
+
+    
   );
 }
