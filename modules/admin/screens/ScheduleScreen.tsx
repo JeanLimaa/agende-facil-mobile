@@ -5,6 +5,7 @@ import { Calendar } from "react-native-calendars";
 import { router } from "expo-router";
 import { styles } from "../styles/styles";
 import { ActionsModal } from "@/components/ActionsModal";
+import api from "@/services/apiService";
 
 interface IAppointment {
   id: string;
@@ -75,12 +76,22 @@ export function ScheduleScreen() {
     closeModal();
   }
 
-  function toggleAttended() {
+  async function toggleAttended() {
+    if (!selectedAppointment) {
+      alert("Nenhum agendamento selecionado.");
+      return;
+    }
+
     // mudar status do agendamento para atendido;
+    try {
+      await api.patch(`/appointment/mark-as-completed/${selectedAppointment.id}`);
+    } catch (error) {
+      alert("Erro ao marcar agendamento como atendido. Por favor, tente novamente.");
+      return;
+    }
 
     closeModal();
   }
-
 
   function handleShowAll() {
     setShowAll(!showAll);
