@@ -3,7 +3,7 @@ import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from "react-nati
 import { Appbar, TextInput, Button, Dialog, Portal, Chip, Checkbox, Divider, Menu, Modal } from "react-native-paper";
 import { Calendar, DateData } from "react-native-calendars";
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { Colors } from "@/constants/Colors";
 import { BASE_URL } from "@/constants/apiUrl";
 import api from "@/services/apiService";
@@ -34,7 +34,7 @@ interface Category {
   description?: string;
 }
 
-export function NewScheduleScreen() {
+export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);

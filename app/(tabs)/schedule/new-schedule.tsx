@@ -1,5 +1,5 @@
-import { NewScheduleScreen } from "@/modules/admin/screens/NewScheduleScreen";
+import { ScheduleForm } from "@/modules/admin/screens/ScheduleForm";
 
 export default function NewSchedulePage() {
-  return <NewScheduleScreen />
+  return <ScheduleForm />
 }
