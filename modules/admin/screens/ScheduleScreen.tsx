@@ -6,6 +6,8 @@ import { router } from "expo-router";
 import { styles } from "../styles/styles";
 import { ActionsModal } from "@/components/ActionsModal";
 import api from "@/services/apiService";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { LoadingModal } from "@/components/LoadingModal";
 
 interface IAppointment {
   id: string;
@@ -17,12 +19,28 @@ interface IAppointment {
   price: string;
 }
 
-const appointments: IAppointment[] = [
-  { id: "1", date: "2025-01-01", timeStart: "15:00", timeEnd: "15:30", client: "Cliente 1", appointmentStatus: "Pago", price: "R$ 100,00" },
-  { id: "2", date: "2025-01-01", timeStart: "16:00", timeEnd: "16:30", client: "Cliente 2", appointmentStatus: "Pendente", price: "R$ 150,00" },
-  { id: "3", date: "2025-01-02", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
-  { id: "4", date: "2025-04-29", timeStart: "14:00", timeEnd: "14:30", client: "Cliente 3", appointmentStatus: "Pago", price: "R$ 200,00" },
-];
+enum AppointmentStatus {
+  PENDING = "Pendente",
+  COMPLETED = "Concluído",
+  CONFIRMED = "Confirmado",
+  CANCELED = "Cancelado",
+}
+
+async function fetchAppointments() {
+  const response = await api.get("/appointment/company");
+  return response.data.map((item: any) => {
+    const dateObj = new Date(item.date);
+    return {
+      id: String(item.id),
+      date: item.date.split("T")[0], // extrai apenas a data (YYYY-MM-DD)
+      timeStart: dateObj.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' }),
+      timeEnd: new Date(dateObj.getTime() + 30 * 60000).toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' }),
+      client: item.clientName ?? "Cliente não informado",
+      appointmentStatus: item.status,
+      price: `R$ ${item.totalPrice?.toFixed(2).replace('.', ',') ?? '0,00'}`,
+    };
+  });
+}
 
 // Função para agrupar os agendamentos por data E ordenamente do mais recente para o mais antigo
 const groupByDate = (appointments: IAppointment[]): { [key: string]: IAppointment[] } => {
@@ -51,6 +69,24 @@ export function ScheduleScreen() {
 
   const [selectedAppointment, setSelectedAppointment] = useState<IAppointment | null>(null);
 
+  const { data, isLoading, error } = useQuery<IAppointment[]>({
+    queryKey: ["appointments"],
+    queryFn: fetchAppointments,
+    refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minuto
+  });
+
+  if (isLoading) {
+    console.log("Carregando agendamentos...");
+    return <LoadingModal visible={isLoading} />;
+  }
+  
+  if (error) {
+    console.error("Erro ao buscar agendamentos:", error);
+    return <Text>Erro ao carregar os agendamentos.</Text>;
+  }
+  
+  const appointments = Array.isArray(data) ? data : [];
+  
   function openModal(appointment: IAppointment) {
     setSelectedAppointment(appointment);
   }
@@ -70,25 +106,34 @@ export function ScheduleScreen() {
     closeModal();
   }
 
-  function handleCancel() {
-    // implementar o cancelamento e notificação real
-    alert("Agendamento cancelado e cliente notificado.");
-    closeModal();
-  }
+  const queryClient = useQueryClient();
 
-  async function toggleAttended() {
+  const changeAppointmentStatus = useMutation({
+    mutationFn: async ({ appointmentId, status }: 
+      { 
+        appointmentId: string; 
+        status: "complete" | "cancel";
+      }) => {
+      return await api.patch(`/appointment/${status}/${appointmentId}`);
+    },
+  
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+  
+    onError: (error) => {
+      console.error("Erro ao marcar agendamento como atendido:", error);
+      alert("Erro ao marcar agendamento como atendido. Por favor, tente novamente.");
+    },
+  });
+  
+  async function toggleAttended(status: "complete" | "cancel") {
     if (!selectedAppointment) {
       alert("Nenhum agendamento selecionado.");
       return;
     }
-
-    // mudar status do agendamento para atendido;
-    try {
-      await api.patch(`/appointment/mark-as-completed/${selectedAppointment.id}`);
-    } catch (error) {
-      alert("Erro ao marcar agendamento como atendido. Por favor, tente novamente.");
-      return;
-    }
+    
+    await changeAppointmentStatus.mutateAsync({ appointmentId: selectedAppointment.id, status });
 
     closeModal();
   }
@@ -191,13 +236,17 @@ export function ScheduleScreen() {
         onClose={closeModal} 
         title="Ações do Agendamento"
         options={[
-          { label: "Editar", action: handleEdit, icon: {name: "edit"}  },
-          { label: "Cancelar", action: handleCancel, icon: {name: "cancel"} },
-          { label: "Marcar como Atendido", action: toggleAttended, icon: {name: "check-circle"} },
+          { label: "Editar", action: handleEdit, icon: {name: "edit"} },
+      
+          ...(selectedAppointment?.appointmentStatus.toLowerCase() !== AppointmentStatus.COMPLETED.toLowerCase()
+            ? [{ label: "Marcar como Atendido", action: () => toggleAttended("complete"), icon: { name: "check-circle" } }]
+            : []),
+      
+          ...(selectedAppointment?.appointmentStatus.toLowerCase() === AppointmentStatus.PENDING.toLowerCase()
+            ? [{ label: "Cancelar", action: () => toggleAttended("cancel"), icon: { name: "cancel" } }]
+            : []),
         ]}
       />
     </View>
-
-    
   );
 }
