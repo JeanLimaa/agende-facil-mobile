@@ -6,6 +6,7 @@ import NewSchedulePage from "./schedule/new-schedule";
 import { Appbar } from "react-native-paper";
 import { Header } from "@/components/Header/Header";
 import { ProtectRoute } from "@/components/ProtectRoute";
+import ScheduleEditPage from "./schedule/[scheduleEditId]";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -15,6 +16,7 @@ function StackNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="DrawerScreens" component={DrawerNavigator} />
       <Stack.Screen name="schedule/new-schedule" component={NewSchedulePage} />
+      <Stack.Screen name="schedule/[scheduleEditId]" component={ScheduleEditPage} />
     </Stack.Navigator>
   );
 }
