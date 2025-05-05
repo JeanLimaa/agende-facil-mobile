@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, FlatList,  TouchableOpacity } from "react-native";
-import { FAB, Card, Text, Switch } from "react-native-paper";
+import { FAB, Card, Text, Switch, Portal, Dialog, Button } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import { router } from "expo-router";
 import { styles } from "../styles/styles";
@@ -66,32 +66,41 @@ export function ScheduleScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
   const [showAll, setShowAll] = useState(false);
+  const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
 
   const [selectedAppointment, setSelectedAppointment] = useState<IAppointment | null>(null);
+
+  const [isActionModalVisible, setIsActionModalVisible] = useState(false);
 
   const { data, isLoading, error } = useQuery<IAppointment[]>({
     queryKey: ["appointments"],
     queryFn: fetchAppointments,
     refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minuto
   });
+  const appointments = data || [];
 
-  if (isLoading) {
-    console.log("Carregando agendamentos...");
-    return <LoadingModal visible={isLoading} />;
+  if (isLoading) return <LoadingModal visible={isLoading} />;
+  if (error) return <Text>Erro ao carregar os agendamentos.</Text>;
+  
+
+  function handleCancel() {
+    setIsCancelDialogVisible(true);
+    setIsActionModalVisible(false);
   }
-  
-  if (error) {
-    console.error("Erro ao buscar agendamentos:", error);
-    return <Text>Erro ao carregar os agendamentos.</Text>;
+
+  function handleConfirmCancel() {
+    toggleAttended("cancel");
+    setIsCancelDialogVisible(false);
+    setSelectedAppointment(null);
   }
-  
-  const appointments = Array.isArray(data) ? data : [];
-  
-  function openModal(appointment: IAppointment) {
+
+  function openActionsModal(appointment: IAppointment) {
     setSelectedAppointment(appointment);
+    setIsActionModalVisible(true);
   }
 
-  function closeModal() {
+  function closeActionsModal() {
+    setIsActionModalVisible(false);
     setSelectedAppointment(null);
   }
 
@@ -103,7 +112,7 @@ export function ScheduleScreen() {
         selectedAppointment: JSON.stringify(selectedAppointment),
       },
     });
-    closeModal();
+    closeActionsModal();
   }
 
   const queryClient = useQueryClient();
@@ -135,7 +144,7 @@ export function ScheduleScreen() {
     
     await changeAppointmentStatus.mutateAsync({ appointmentId: selectedAppointment.id, status });
 
-    closeModal();
+    closeActionsModal();
   }
 
   function handleShowAll() {
@@ -197,8 +206,11 @@ export function ScheduleScreen() {
               key={item.id}
               style={[
                 styles.card,
+                item.appointmentStatus === AppointmentStatus.COMPLETED
+                  ? { borderTopWidth: 4, borderTopColor: "#4CAF50" }
+                  : { borderTopWidth: 4, borderTopColor: "#FF9800" }
               ]}
-              onPress={() => openModal(item)}
+              onPress={() => openActionsModal(item)}
             >
               <Card.Content>
                 <View style={styles.cardRow}>
@@ -232,8 +244,8 @@ export function ScheduleScreen() {
       <FAB style={styles.fab} icon="plus" onPress={() => router.push("/(tabs)/schedule/new-schedule")} />
 
       <ActionsModal 
-        visible={!!selectedAppointment} 
-        onClose={closeModal} 
+        visible={!!selectedAppointment && isActionModalVisible} 
+        onClose={closeActionsModal} 
         title="Ações do Agendamento"
         options={[
           { label: "Editar", action: handleEdit, icon: {name: "edit"} },
@@ -243,10 +255,27 @@ export function ScheduleScreen() {
             : []),
       
           ...(selectedAppointment?.appointmentStatus.toLowerCase() === AppointmentStatus.PENDING.toLowerCase()
-            ? [{ label: "Cancelar", action: () => toggleAttended("cancel"), icon: { name: "cancel" } }]
+            ? [{ label: "Cancelar", action: handleCancel, icon: { name: "cancel" } }]
             : []),
         ]}
       />
+
+      <Portal>
+        <Dialog visible={isCancelDialogVisible} onDismiss={() => setIsCancelDialogVisible(false)}>
+          <Dialog.Title>Cancelar Agendamento</Dialog.Title>
+          <Dialog.Content>
+            <Text>Tem certeza de que deseja cancelar este agendamento?</Text>
+          </Dialog.Content>
+          <Dialog.Actions>
+            <Button onPress={() => setIsCancelDialogVisible(false)}>Não</Button>
+            <Button
+              onPress={handleConfirmCancel}
+            >
+              Sim
+            </Button>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </View>
   );
 }
