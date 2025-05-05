@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, FlatList,  TouchableOpacity } from "react-native";
 import { FAB, Card, Text, Switch, Portal, Dialog, Button } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
-import { router } from "expo-router";
+import { Redirect, router } from "expo-router";
 import { styles } from "../styles/styles";
 import { ActionsModal } from "@/components/ActionsModal";
 import api from "@/services/apiService";
@@ -79,6 +79,27 @@ export function ScheduleScreen() {
   });
   const appointments = data || [];
 
+  const queryClient = useQueryClient();
+
+  const changeAppointmentStatus = useMutation({
+    mutationFn: async ({ appointmentId, status }: 
+      { 
+        appointmentId: string; 
+        status: "complete" | "cancel";
+      }) => {
+      return await api.patch(`/appointment/${status}/${appointmentId}`);
+    },
+  
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+    },
+  
+    onError: (error) => {
+      console.error("Erro ao marcar agendamento como atendido:", error);
+      alert("Erro ao marcar agendamento como atendido. Por favor, tente novamente.");
+    },
+  });
+
   if (isLoading) return <LoadingModal visible={isLoading} />;
   if (error) return <Text>Erro ao carregar os agendamentos.</Text>;
   
@@ -105,36 +126,18 @@ export function ScheduleScreen() {
   }
 
   function handleEdit() {
-    console.log("Editando agendamento:", selectedAppointment);
-    router.push({ 
-      pathname: "/(tabs)/schedule/new-schedule", 
-      params: {
-        selectedAppointment: JSON.stringify(selectedAppointment),
-      },
+    if (!selectedAppointment) {
+      alert("Nenhum agendamento selecionado.");
+      return;
+    }
+    
+    router.push({
+      pathname: "/(tabs)/schedule/[scheduleEditId]",
+      params: { scheduleEditId: selectedAppointment.id },
     });
+    
     closeActionsModal();
   }
-
-  const queryClient = useQueryClient();
-
-  const changeAppointmentStatus = useMutation({
-    mutationFn: async ({ appointmentId, status }: 
-      { 
-        appointmentId: string; 
-        status: "complete" | "cancel";
-      }) => {
-      return await api.patch(`/appointment/${status}/${appointmentId}`);
-    },
-  
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    },
-  
-    onError: (error) => {
-      console.error("Erro ao marcar agendamento como atendido:", error);
-      alert("Erro ao marcar agendamento como atendido. Por favor, tente novamente.");
-    },
-  });
   
   async function toggleAttended(status: "complete" | "cancel") {
     if (!selectedAppointment) {
@@ -162,6 +165,20 @@ export function ScheduleScreen() {
   const groupedAppointments = groupByDate(filteredAppointments);
   const dates = Object.keys(groupedAppointments);
   
+  const actionOptions = [];
+
+  if (selectedAppointment) {
+    actionOptions.push({ label: "Editar", action: handleEdit, icon: { name: "edit" } });
+
+    if (selectedAppointment.appointmentStatus.toLowerCase() !== AppointmentStatus.COMPLETED.toLowerCase()) {
+      actionOptions.push({ label: "Marcar como Atendido", action: () => toggleAttended("complete"), icon: { name: "check-circle" } });
+    }
+
+    if (selectedAppointment.appointmentStatus.toLowerCase() === AppointmentStatus.PENDING.toLowerCase()) {
+      actionOptions.push({ label: "Cancelar", action: handleCancel, icon: { name: "cancel" } });
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Botão de Mostrar/Ocultar Calendário */}
@@ -247,17 +264,7 @@ export function ScheduleScreen() {
         visible={!!selectedAppointment && isActionModalVisible} 
         onClose={closeActionsModal} 
         title="Ações do Agendamento"
-        options={[
-          { label: "Editar", action: handleEdit, icon: {name: "edit"} },
-      
-          ...(selectedAppointment?.appointmentStatus.toLowerCase() !== AppointmentStatus.COMPLETED.toLowerCase()
-            ? [{ label: "Marcar como Atendido", action: () => toggleAttended("complete"), icon: { name: "check-circle" } }]
-            : []),
-      
-          ...(selectedAppointment?.appointmentStatus.toLowerCase() === AppointmentStatus.PENDING.toLowerCase()
-            ? [{ label: "Cancelar", action: handleCancel, icon: { name: "cancel" } }]
-            : []),
-        ]}
+        options={actionOptions}
       />
 
       <Portal>
