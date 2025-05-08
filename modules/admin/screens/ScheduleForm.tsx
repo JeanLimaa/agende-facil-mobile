@@ -15,6 +15,12 @@ import { Client } from "../types/client.interface";
 import { Employee } from "../types/employee.interface";
 import { Service } from "../types/service.interface";
 import { Category } from "../types/category.interface"; 
+import { AppointmentEditResponse } from "../types/appointment.types";
+
+async function fetchSchedule(scheduleId: number): Promise<AppointmentEditResponse> {
+    const response = await api.get(`/appointment/${scheduleId}`);
+    return response.data;
+}
 
 export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -123,6 +129,25 @@ export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
         : [...prev, serviceId]
     );
   };
+
+  const { data: editItemData, isLoading, error } = useQuery({
+    queryKey: ['employees'],
+    queryFn: () => fetchSchedule(Number(scheduleEditId)),
+    enabled: !!scheduleEditId,
+  });
+
+  if (isLoading) return <Text>Carregando...</Text>;
+  if (error) return <Text>Erro ao carregar os dados</Text>;
+
+  useEffect(() => {
+    if (editItemData?.employee) {
+      setSelectedEmployee(editItemData.employee.id);
+      editItemData.appointmentServices.forEach(service => {
+        setSelectedServices(prev => [...prev, service.serviceId]);
+      });
+    }
+  }, [editItemData]);
+
 
   const filteredServices = services.filter(s => !selectedCategoryId || s.categoryId === selectedCategoryId);
 

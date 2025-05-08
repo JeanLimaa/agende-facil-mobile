@@ -1,3 +1,5 @@
+import { Employee } from "./employee.interface";
+
 export interface IAppointment {
   id: string;
   date: string;
@@ -13,4 +15,13 @@ export enum AppointmentStatus {
   COMPLETED = "Concluído",
   CONFIRMED = "Confirmado",
   CANCELED = "Cancelado",
+}
+
+export interface AppointmentEditResponse extends IAppointment {
+  clientId: number;
+  employee: Employee;
+  appointmentServices: {
+    appointmentId: number;
+    serviceId: number;
+  }[];
 }
