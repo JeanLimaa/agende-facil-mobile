@@ -10,29 +10,11 @@ import api from "@/services/apiService";
 import { Axios, AxiosError, AxiosResponse } from "axios";
 import { textCapitalize } from "@/helpers/textCapitalize";
 import { formatToCurrency } from "@/helpers/formatValue";
-
-interface Employee {
-  id: number;
-  name: string;
-}
-
-interface Service {
-  id: number;
-  name: string;
-  price: number;
-  categoryId: number;
-}
-
-interface Client {
-  id: number;
-  name: string;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  description?: string;
-}
+import { useQuery } from "@tanstack/react-query";
+import { Client } from "../types/client.interface";
+import { Employee } from "../types/employee.interface";
+import { Service } from "../types/service.interface";
+import { Category } from "../types/category.interface"; 
 
 export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -65,7 +47,7 @@ export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
     .reduce((sum, service) => sum + service.price, 0);
   }, [selectedServices, services]);
   const totalPrice = (subTotalPrice - discount) >= 0 ? subTotalPrice - discount : 0;
-  
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {

@@ -8,23 +8,8 @@ import { ActionsModal } from "@/components/ActionsModal";
 import api from "@/services/apiService";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoadingModal } from "@/components/LoadingModal";
-
-interface IAppointment {
-  id: string;
-  date: string;
-  timeStart: string;
-  timeEnd: string;
-  client: string;
-  appointmentStatus: string;
-  price: string;
-}
-
-enum AppointmentStatus {
-  PENDING = "Pendente",
-  COMPLETED = "Concluído",
-  CONFIRMED = "Confirmado",
-  CANCELED = "Cancelado",
-}
+import { IAppointment } from "../types/appointment.types";
+import { AppointmentStatus } from "../types/appointment.types";
 
 async function fetchAppointments() {
   const response = await api.get("/appointment/company");
