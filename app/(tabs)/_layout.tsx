@@ -1,12 +1,12 @@
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from ".";
-import SchedulePage from "./schedule";
-import NewSchedulePage from "./schedule/new-schedule";
+import AppointmentPage from "./appointment";
+import NewAppointmentPage from "./appointment/new-appointment";
 import { Appbar } from "react-native-paper";
 import { Header } from "@/components/Header/Header";
 import { ProtectRoute } from "@/components/ProtectRoute";
-import ScheduleEditPage from "./schedule/[scheduleEditId]";
+import AppointmentEditPage from "./appointment/[appointmentEditId]";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -15,8 +15,8 @@ function StackNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="DrawerScreens" component={DrawerNavigator} />
-      <Stack.Screen name="schedule/new-schedule" component={NewSchedulePage} />
-      <Stack.Screen name="schedule/[scheduleEditId]" component={ScheduleEditPage} />
+      <Stack.Screen name="appointment/new-appointment" component={NewAppointmentPage} />
+      <Stack.Screen name="appointment/[appointmentEditId]" component={AppointmentEditPage} />
     </Stack.Navigator>
   );
 }
@@ -33,8 +33,8 @@ function DrawerNavigator() {
         ),
       }}
     >
-      <Drawer.Screen name="Home" component={HomeScreen} />
-      <Drawer.Screen name="Schedule" component={SchedulePage} />
+      <Drawer.Screen name="Inicio" component={HomeScreen} />
+      <Drawer.Screen name="Agendamentos" component={AppointmentPage} />
     </Drawer.Navigator>
   );
 }

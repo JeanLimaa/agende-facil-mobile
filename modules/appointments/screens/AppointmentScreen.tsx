@@ -47,7 +47,7 @@ const groupByDate = (appointments: IAppointment[]): { [key: string]: IAppointmen
   return Object.fromEntries(sortedEntries);
 };
 
-export function ScheduleScreen() {
+export function AppointmentScreen() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
   const [isCalendarExpanded, setIsCalendarExpanded] = useState(true);
   const [showAll, setShowAll] = useState(false);
@@ -117,8 +117,8 @@ export function ScheduleScreen() {
     }
     
     router.push({
-      pathname: "/(tabs)/schedule/[scheduleEditId]",
-      params: { scheduleEditId: selectedAppointment.id },
+      pathname: "/(tabs)/appointment/[appointmentEditId]",
+      params: { appointmentEditId: selectedAppointment.id },
     });
     
     closeActionsModal();

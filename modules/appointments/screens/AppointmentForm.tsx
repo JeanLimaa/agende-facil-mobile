@@ -17,12 +17,12 @@ import { Service } from "../types/service.interface";
 import { Category } from "../types/category.interface"; 
 import { AppointmentEditResponse } from "../types/appointment.types";
 
-async function fetchSchedule(scheduleId: number): Promise<AppointmentEditResponse> {
-    const response = await api.get(`/appointment/${scheduleId}`);
+async function fetchAppointment(appointmentId: number): Promise<AppointmentEditResponse> {
+    const response = await api.get(`/appointment/${appointmentId}`);
     return response.data;
 }
 
-export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
+export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string}) {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -132,8 +132,8 @@ export function ScheduleForm({scheduleEditId}: {scheduleEditId?: string}) {
 
   const { data: editItemData, isLoading, error } = useQuery({
     queryKey: ['employees'],
-    queryFn: () => fetchSchedule(Number(scheduleEditId)),
-    enabled: !!scheduleEditId,
+    queryFn: () => fetchAppointment(Number(appointmentEditId)),
+    enabled: !!appointmentEditId,
   });
 
   if (isLoading) return <Text>Carregando...</Text>;
