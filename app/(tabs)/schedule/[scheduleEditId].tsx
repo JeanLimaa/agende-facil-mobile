@@ -1,4 +1,4 @@
-import { ScheduleForm } from "@/modules/admin/screens/ScheduleForm";
+import { ScheduleForm } from "@/modules/appointments/screens/ScheduleForm";
 import { useGlobalSearchParams, useLocalSearchParams } from "expo-router";
 
 export default function ScheduleEditId() {
