@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { View, StyleSheet, ScrollView, Text, TouchableOpacity } from "react-native";
-import { Appbar, TextInput, Button, Dialog, Portal, Chip, Checkbox, Divider, Menu, Modal } from "react-native-paper";
-import { Calendar, DateData } from "react-native-calendars";
-import DateTimePicker from '@react-native-community/datetimepicker';
-import { router, useLocalSearchParams } from "expo-router";
-import { Colors } from "@/constants/Colors";
-import { BASE_URL } from "@/constants/apiUrl";
+import { View, ScrollView, Text } from "react-native";
+import { Appbar,  Button, Dialog, Portal, Divider } from "react-native-paper";
+import { router } from "expo-router";
 import api from "@/services/apiService";
-import { Axios, AxiosError, AxiosResponse } from "axios";
-import { textCapitalize } from "@/helpers/textCapitalize";
-import { formatToCurrency } from "@/helpers/formatValue";
-import { useQuery } from "@tanstack/react-query";
+import { AxiosError, AxiosResponse } from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Client } from "../types/client.interface";
 import { Employee } from "../types/employee.interface";
 import { Service } from "../types/service.interface";
 import { Category } from "../types/category.interface"; 
 import { AppointmentEditResponse } from "../types/appointment.types";
+import { appointmentFormStyle as styles } from "../styles/styles";
+import { EmployeeSelector } from "../components/EmployeeSelector";
+import { ClientSelector } from "../components/ClientSelector";
+import { DatePicker, DateTimeSelector, TimePicker } from "../components/DateTimeSelector";
+import { ServiceSelector } from "../components/ServiceSelector";
+import { SummaryShow } from "../components/SummaryShow";
 
 async function fetchAppointment(appointmentId: number): Promise<AppointmentEditResponse> {
     const response = await api.get(`/appointment/${appointmentId}`);
@@ -29,11 +29,7 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<number>();
-  const [clients] = useState<Client[]>([
-    {id: 1, name: "Cliente 1"},
-    {id: 2, name: "Cliente 2"},
-    {id: 3, name: "Cliente 3"},
-  ]);
+
   const [selectedClient, setSelectedClient] = useState<Client>();
   const [services, setServices] = useState<Service[]>([]);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
@@ -54,6 +50,8 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
   }, [selectedServices, services]);
   const totalPrice = (subTotalPrice - discount) >= 0 ? subTotalPrice - discount : 0;
 
+  const queryClient = useQueryClient();
+  
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
@@ -112,22 +110,17 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
         serviceId: selectedServices,
         employeeId: selectedEmployee,
         date: `${date}T${time.toISOString().split('T')[1]}`,
+        clientId: selectedClient.id,
       });
     } catch (error) {
       if (error instanceof AxiosError) {
         console.error(error?.response?.data);
       }
     };
+    
+    queryClient.invalidateQueries({ queryKey: ['appointments'] });
 
     router.back();
-  };
-
-  const toggleService = (serviceId: number) => {
-    setSelectedServices(prev => 
-      prev.includes(serviceId)
-        ? prev.filter(id => id !== serviceId)
-        : [...prev, serviceId]
-    );
   };
 
   const { data: editItemData, isLoading, error } = useQuery({
@@ -136,20 +129,16 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
     enabled: !!appointmentEditId,
   });
 
-  if (isLoading) return <Text>Carregando...</Text>;
-  if (error) return <Text>Erro ao carregar os dados</Text>;
-
   useEffect(() => {
     if (editItemData?.employee) {
       setSelectedEmployee(editItemData.employee.id);
-      editItemData.appointmentServices.forEach(service => {
-        setSelectedServices(prev => [...prev, service.serviceId]);
-      });
+      setSelectedServices(editItemData.appointmentServices.map(s => s.serviceId));
     }
   }, [editItemData]);
+  
 
-
-  const filteredServices = services.filter(s => !selectedCategoryId || s.categoryId === selectedCategoryId);
+  if (isLoading) return <Text>Carregando...</Text>;
+  if (error) return <Text>Erro ao carregar os dados</Text>;
 
   return (
     <View style={styles.container}>
@@ -159,174 +148,50 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Seleção de Funcionário */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Funcionário</Text>
-
-          <Menu
-            style={{width: inputWidth}}
-            visible={menuVisible.employee}
-            onDismiss={() => setMenuVisible({ ...menuVisible, employee: false })}
-            anchor={
-              <Button 
-                onPress={() => setMenuVisible({ ...menuVisible, employee: true })}
-                mode="outlined"
-                style={styles.input}
-              >
-                {selectedEmployee 
-                  ? employees.find(e => e.id === selectedEmployee)?.name
-                  : "Selecione o funcionário"}
-              </Button>
-            }>
-            {employees.map(employee => (
-              <Menu.Item
-                key={employee.id}
-                title={employee.name}
-                onPress={() => {
-                  setSelectedEmployee(employee.id);
-                  setMenuVisible({ ...menuVisible, employee: false });
-                }}
-              />
-            ))}
-          </Menu>
-        </View>
+        <EmployeeSelector 
+          employees={employees}
+          selectedEmployee={selectedEmployee}
+          setSelectedEmployee={setSelectedEmployee}
+          menuVisible={menuVisible}
+          setMenuVisible={setMenuVisible}
+          inputWidth={inputWidth}
+        />
 
         {/* Seleção de Cliente */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Cliente</Text>
-
-          <Menu
-            visible={menuVisible.client}
-            style={{width: inputWidth}}
-            onDismiss={() => setMenuVisible({ ...menuVisible, client: false })}
-            anchor={
-              <Button 
-                onPress={() => setMenuVisible({ ...menuVisible, client: true })}
-                mode="outlined"
-                style={styles.input}
-                onLayout={(event) => setInputWidth(event.nativeEvent.layout.width)}
-              >
-                {selectedClient?.name || "Selecione o cliente"}
-              </Button>
-            }>
-            {clients.map(client => (
-              <Menu.Item
-                key={client.id}
-                title={client.name}
-                onPress={() => {
-                  setSelectedClient(client);
-                  setMenuVisible({ ...menuVisible, client: false });
-                }}
-              />
-            ))}
-          </Menu>
-        </View>
+        <ClientSelector
+          selectedClient={selectedClient}
+          setSelectedClient={setSelectedClient}
+          menuVisible={menuVisible}
+          setMenuVisible={setMenuVisible}
+          inputWidth={inputWidth}
+          setInputWidth={setInputWidth}
+        />
         
         {/* Seleção de Data e Hora */}
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Data e Horário</Text>
+        <DateTimeSelector
+          date={date}
+          time={time}
+          setShowDatePicker={setShowDatePicker}
+          setShowTimePicker={setShowTimePicker}
+        />
 
-          <View style={styles.row}>
-            <TouchableOpacity 
-              onPress={() => setShowDatePicker(true)} 
-              activeOpacity={0.8}
-              style={styles.flex}
-            >
-              <TextInput
-                label="Data"
-                value={date.split('-').reverse().join('/')}
-                right={<TextInput.Icon icon="calendar" onPress={() => setShowDatePicker(true)} />}
-                editable={false}
-              />
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              onPress={() => setShowTimePicker(true)} 
-              activeOpacity={0.8}
-              style={styles.flex}
-            >
-              <TextInput
-              label="Horário"
-              value={time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-              right={<TextInput.Icon icon="clock" onPress={() => setShowTimePicker(true)} />}
-              editable={false}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Serviços</Text>
-
-          {/* Filtro de Categoria */}
-          <View>
-            <Text style={styles.smallLabel}>Filtrar por categoria</Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false} 
-              style={styles.chipContainer}
-            >
-              {categories.map(category => (
-                <Chip
-                  key={category.id}
-                  selected={selectedCategoryId === category.id}
-                  onPress={() => setSelectedCategoryId(
-                    selectedCategoryId === category.id ? 0 : category.id
-                  )}
-                  style={[styles.chip, selectedCategoryId === category.id && styles.chipSelected]}
-                >
-                  {textCapitalize(category.name)}
-                </Chip>
-              ))}
-            </ScrollView>
-          </View>
-
-          {/* Lista de Serviços */}
-          {services.length === 0 ? <Text style={styles.mediumLabel}>Nenhum serviço encontrado</Text> : 
-            filteredServices
-            .map(service => (
-              <View key={service.id}>
-                <View style={styles.serviceItem}>
-                  <Checkbox
-                    status={selectedServices.includes(service.id) ? 'checked' : 'unchecked'}
-                    onPress={() => toggleService(service.id)}
-                  />
-                  <View style={styles.serviceInfo}>
-                    <Text>{service.name}</Text>
-                    <Text>{formatToCurrency(service.price)}</Text>
-                  </View>
-                </View>
-                <Divider />
-              </View>
-          ))}
-          {services.length > 0 && filteredServices.length === 0 ? 
-            <Text style={styles.mediumLabel}>Não há serviços cadastrados para essa categoria.</Text> 
-          : null}
-            
-        </View>
+        <ServiceSelector
+          services={services}
+          categories={categories}
+          selectedServices={selectedServices}
+          setSelectedServices={setSelectedServices}
+          selectedCategoryId={selectedCategoryId}
+          setSelectedCategoryId={setSelectedCategoryId}
+        />
 
         <Divider />
 
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Resumo</Text>
-{/*           <View>
-            <Text style={styles.sectionLabel}>SubTotal</Text>
-            <Text style={styles.sectionLabel}>{formatToCurrency(totalPrice)}</Text>
-          </View>
-          <View>
-            <Text style={styles.sectionLabel}>Desconto</Text>
-            <TextInput
-              keyboardType="numeric"
-              style={styles.input}
-              value={discount.toString()}
-              onChangeText={(value) => setDiscount(Number(value.replace(/\D/g, '')))}
-            />
-          </View> */}
-          <View>
-            <Text style={styles.sectionSubLabel}>Valor Total</Text>
-            <Text style={styles.sectionSubLabel}>{formatToCurrency(totalPrice)}</Text>
-          </View>
-        </View>
+        <SummaryShow
+          subTotalPrice={subTotalPrice}
+          totalPrice={totalPrice}
+          discount={discount}
+          setDiscount={setDiscount}
+        />
 
         <Button 
           mode="contained" 
@@ -338,38 +203,20 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
       </ScrollView>
 
       {/* Date Picker */}
-      <Portal>
-        <Modal
-          visible={showDatePicker}
-          onDismiss={() => setShowDatePicker(false)}
-          style={{margin: 10}}
-        >
-          <Calendar
-            onDayPress={(day: DateData) => {
-              setDate(day.dateString);
-              setShowDatePicker(false);
-            }}
-            markedDates={{ [date]: { selected: true } }}
-            style={{
-              borderRadius: 10,
-            }}
-          />
-        </Modal>
-      </Portal>
-
+      <DatePicker 
+        date={date}
+        setDate={setDate}
+        showDatePicker={showDatePicker}
+        setShowDatePicker={setShowDatePicker}
+      />
 
       {/* Time Picker */}
-      {showTimePicker && (
-        <DateTimePicker
-          value={time}
-          mode="time"
-          is24Hour={true}
-          onChange={(_, selectedTime) => {
-            setShowTimePicker(false);
-            if (selectedTime) setTime(selectedTime);
-          }}
-        />
-      )}
+      <TimePicker 
+        showTimePicker={showTimePicker}
+        setShowTimePicker={setShowTimePicker}
+        time={time}
+        setTime={setTime}
+      />
 
       {/* Dialog de Validação */}
       <Portal>
@@ -386,83 +233,3 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#EAEAEA",
-  },
-  header: {
-    backgroundColor: "#FF6600",
-  },
-  content: {
-    padding: 16,
-  },
-  row: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 8,
-    width: '100%',
-  },
-  flex: {
-    flex: 1,
-  },
-  input: {
-    marginBottom: 8,
-  },
-  chipContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
-    marginBottom: 8,
-  },
-  chip: {
-    margin: 2,
-  },
-  chipSelected: {
-    backgroundColor: Colors.light.mainColor,
-  },
-  serviceItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  serviceInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginLeft: 8,
-  },
-  saveButton: {
-    marginTop: 16,
-    backgroundColor: "#FF6600",
-  },
-  sectionContainer: {
-    marginBottom: 6,
-  },
-  sectionLabel: {
-    fontSize: 14,
-    fontWeight: "700",
-    margin: 5,
-    color: Colors.light.textSecondary
-  },
-  sectionSubLabel: {
-    fontSize: 13,
-    fontWeight: "500",
-    margin: 5,
-    color: Colors.light.textSecondary
-  },
-  smallLabel: {
-    fontSize: 12,
-    marginHorizontal: 5,
-    marginBottom: 5,
-    color: Colors.light.textSecondary
-  },
-  mediumLabel: {
-    fontSize: 14,
-    fontWeight: "500",
-    marginHorizontal: 5,
-    marginBottom: 5,
-    color: Colors.light.textSecondary
-  }
-});
