@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/Colors";
 import { StyleSheet } from "react-native";
 
 export const styles = StyleSheet.create({
@@ -75,4 +76,99 @@ export const styles = StyleSheet.create({
         textAlign: "left",
         marginBottom: 5,
     },
-  });
+});
+
+export const appointmentFormStyle = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#EAEAEA",
+  },
+  header: {
+    backgroundColor: "#FF6600",
+  },
+  content: {
+    padding: 16,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 8,
+    width: '100%',
+  },
+  flex: {
+    flex: 1,
+  },
+  input: {
+    fontSize: 13,
+    fontWeight: "500",
+    color: Colors.light.textSecondary,
+    paddingVertical: 0,
+    paddingHorizontal: 0,
+    marginBottom: 8,
+    borderBottomWidth: 0.5,
+    borderColor: Colors.light.textSecondary,
+    textAlign: "right",
+    minWidth: 80,
+  },
+
+  chipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 4,
+    marginBottom: 8,
+  },
+  chip: {
+    margin: 2,
+  },
+  chipSelected: {
+    backgroundColor: Colors.light.mainColor,
+  },
+  serviceItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  serviceInfo: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginLeft: 8,
+  },
+  saveButton: {
+    marginTop: 16,
+    backgroundColor: "#FF6600",
+  },
+  sectionContainer: {
+    marginBottom: 6,
+  },
+  summarySection: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: "700",
+    margin: 5,
+    color: Colors.light.textSecondary
+  },
+  sectionSubLabel: {
+    fontSize: 13,
+    fontWeight: "500",
+    margin: 5,
+    color: Colors.light.textSecondary
+  },
+  smallLabel: {
+    fontSize: 12,
+    marginHorizontal: 5,
+    marginBottom: 5,
+    color: Colors.light.textSecondary
+  },
+  mediumLabel: {
+    fontSize: 14,
+    fontWeight: "500",
+    marginHorizontal: 5,
+    marginBottom: 5,
+    color: Colors.light.textSecondary
+  }
+});

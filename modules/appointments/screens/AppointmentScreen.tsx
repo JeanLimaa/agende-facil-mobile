@@ -15,6 +15,7 @@ async function fetchAppointments() {
   const response = await api.get("/appointment/company");
   return response.data.map((item: any) => {
     const dateObj = new Date(item.date);
+    
     return {
       id: String(item.id),
       date: item.date.split("T")[0], // extrai apenas a data (YYYY-MM-DD)
@@ -60,7 +61,7 @@ export function AppointmentScreen() {
   const { data, isLoading, error } = useQuery<IAppointment[]>({
     queryKey: ["appointments"],
     queryFn: fetchAppointments,
-    refetchInterval: 5 * 60 * 1000, // Atualiza a cada 5 minuto
+    refetchInterval: 1 * 60 * 1000,
   });
   const appointments = data || [];
 
@@ -243,7 +244,7 @@ export function AppointmentScreen() {
       </View>
 
       {/* Botão Flutuante de Adicionar */}
-      <FAB style={styles.fab} icon="plus" onPress={() => router.push("/(tabs)/schedule/new-schedule")} />
+      <FAB style={styles.fab} icon="plus" onPress={() => router.push("/(tabs)/appointment/new-appointment")} />
 
       <ActionsModal 
         visible={!!selectedAppointment && isActionModalVisible} 
