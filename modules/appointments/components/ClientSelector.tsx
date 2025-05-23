@@ -4,6 +4,8 @@ import { appointmentFormStyle as styles } from "../styles/styles";
 import { Client } from "../types/client.interface";
 import { useState } from "react";
 import { useClients } from "../hooks/useClients";
+import { SelectableList } from "@/components/SelectableList";
+import { SelectableListModal } from "../../../components/SelectableListModal";
 
 interface Props {
   selectedClient?: Client;
@@ -25,12 +27,8 @@ export function ClientSelector({
 }: Props) {
   const { data: clients = [], isLoading } = useClients();
 
-  const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
 
-  const filteredClients = clients.filter(client =>
-    client.name.toLowerCase().includes(search.toLowerCase())
-  );
 
   const handleClientSelect = (client: Client) => {
     setSelectedClient(client);
@@ -50,66 +48,15 @@ export function ClientSelector({
         {selectedClient?.name || "Selecione o cliente"}
       </Button>
 
-      <Modal visible={modalVisible} transparent animationType="fade">
-        <View style={modalStyles.overlay}>
-          <View style={modalStyles.container}>
-            <TextInput
-              placeholder="Buscar cliente..."
-              value={search}
-              onChangeText={setSearch}
-              mode="outlined"
-              style={{ marginBottom: 10 }}
-              left={<TextInput.Icon icon="magnify" />}
-            />
-
-            {isLoading ? (
-              <ActivityIndicator />
-            ) : (
-              <FlatList
-                data={filteredClients}
-                keyExtractor={item => item.id.toString()}
-                renderItem={({ item }) => (
-                  <TouchableOpacity
-                    onPress={() => handleClientSelect(item)}
-                    style={modalStyles.item}
-                  >
-                    <Text>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-                ListEmptyComponent={
-                  <Text style={{ textAlign: "center", padding: 10 }}>
-                    Nenhum cliente encontrado
-                  </Text>
-                }
-              />
-            )}
-
-            <Button onPress={() => setModalVisible(false)} style={{ marginTop: 10 }}>
-              Cancelar
-            </Button>
-          </View>
-        </View>
-      </Modal>
+      <SelectableListModal
+        data={clients}
+        isLoading={isLoading}
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+        handleSelect={handleClientSelect}
+        emptyMessage="Nenhum cliente encontrado"
+      />
     </View>
   );
 }
 
-const modalStyles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    padding: 20,
-  },
-  container: {
-    backgroundColor: "white",
-    borderRadius: 8,
-    padding: 16,
-    maxHeight: "80%",
-  },
-  item: {
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-});

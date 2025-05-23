@@ -1,7 +1,8 @@
 import { View, Text } from "react-native";
 import { appointmentFormStyle as styles } from "../styles/styles";
 import { Employee } from "../types/employee.interface";
-import { Button, Menu } from "react-native-paper";
+import { Button } from "react-native-paper";
+import { SelectableListModal } from "../../../components/SelectableListModal";
 
 interface Props {
   employees: Employee[];
@@ -24,31 +25,24 @@ export function EmployeeSelector({
     <View style={styles.sectionContainer}>
       <Text style={styles.sectionLabel}>Funcionário</Text>
 
-      <Menu
-        style={{ width: inputWidth }}
-        visible={menuVisible.employee}
-        onDismiss={() => setMenuVisible({ ...menuVisible, employee: false })}
-        anchor={
-          <Button
-            onPress={() => setMenuVisible({ ...menuVisible, employee: true })}
-            mode="outlined"
-            style={styles.input}
-          >
-            {selectedEmployee
-              ? employees.find(e => e.id === selectedEmployee)?.name
-              : "Selecione o funcionário"}
-          </Button>
-        }>
-        {employees.map(employee => (
-          <Menu.Item
-            key={employee.id}
-            title={employee.name}
-            onPress={() => {
-              setSelectedEmployee(employee.id);
-              setMenuVisible({ ...menuVisible, employee: false });
-            }}
-          />
-        ))}
-      </Menu>
+      <Button
+        onPress={() => setMenuVisible({ ...menuVisible, employee: true })}
+        mode="outlined"
+        style={styles.input}
+      >
+        {selectedEmployee ? employees.find(employee => employee.id === selectedEmployee)?.name : "Selecione o funcionário"}
+      </Button>
+
+      <SelectableListModal
+        data={employees}
+        isLoading={false}
+        modalVisible={menuVisible.employee}
+        setModalVisible={visible => setMenuVisible({ ...menuVisible, employee: visible })}
+        handleSelect={employee => {
+          setSelectedEmployee(employee.id);
+          setMenuVisible({ ...menuVisible, employee: false });
+        }}
+        emptyMessage="Nenhum funcionário encontrado"
+      />
     </View>
 )}
