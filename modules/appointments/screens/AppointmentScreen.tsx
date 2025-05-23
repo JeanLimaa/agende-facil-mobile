@@ -165,6 +165,17 @@ export function AppointmentScreen() {
     }
   }
 
+  function getStatusBorderColor(status: AppointmentStatus): string {
+    switch (status) {
+      case AppointmentStatus.COMPLETED:
+        return "#4CAF50";
+      case AppointmentStatus.CANCELED:
+        return "#F44336"; 
+      default:
+        return "#FF9800"; 
+    }
+  }
+
   return (
     <View style={styles.container}>
       {/* Botão de Mostrar/Ocultar Calendário */}
@@ -192,6 +203,7 @@ export function AppointmentScreen() {
       <View style={styles.cardContainer}>
       <FlatList
         data={dates}
+        contentContainerStyle={{ paddingBottom: 150 }}
         keyExtractor={(date) => date}
         renderItem={({ item: date }) => (
           <View style={styles.dateSection}>
@@ -209,9 +221,7 @@ export function AppointmentScreen() {
               key={item.id}
               style={[
                 styles.card,
-                item.appointmentStatus === AppointmentStatus.COMPLETED
-                  ? { borderTopWidth: 4, borderTopColor: "#4CAF50" }
-                  : { borderTopWidth: 4, borderTopColor: "#FF9800" }
+                { borderTopWidth: 4, borderTopColor: getStatusBorderColor(item.appointmentStatus) }
               ]}
               onPress={() => openActionsModal(item)}
             >
