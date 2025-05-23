@@ -3,8 +3,7 @@ import { Button, TextInput, ActivityIndicator } from "react-native-paper";
 import { appointmentFormStyle as styles } from "../styles/styles";
 import { Client } from "../types/client.interface";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import api from "@/services/apiService";
+import { useClients } from "../hooks/useClients";
 
 interface Props {
   selectedClient?: Client;
@@ -19,26 +18,15 @@ interface Props {
   setInputWidth: (width: number) => void;
 }
 
-async function fetchClients(): Promise<Client[]> {
-  const response = await api.get("/clients");
-  return response.data;
-}
-
 export function ClientSelector({
   selectedClient,
   setSelectedClient,
-  menuVisible,
-  setMenuVisible,
-  inputWidth,
   setInputWidth,
 }: Props) {
+  const { data: clients = [], isLoading } = useClients();
+
   const [search, setSearch] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
-
-  const { data: clients = [], isLoading } = useQuery<Client[]>({
-    queryKey: ["clients"],
-    queryFn: fetchClients,
-  });
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(search.toLowerCase())

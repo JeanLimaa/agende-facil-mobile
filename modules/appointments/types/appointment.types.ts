@@ -1,3 +1,4 @@
+import { Client } from "./client.interface";
 import { Employee } from "./employee.interface";
 
 export interface IAppointment {
@@ -5,7 +6,7 @@ export interface IAppointment {
   date: string;
   timeStart: string;
   timeEnd: string;
-  client: string;
+  clientName: string;
   appointmentStatus: string;
   price: string;
 }
@@ -18,7 +19,7 @@ export enum AppointmentStatus {
 }
 
 export interface AppointmentEditResponse extends IAppointment {
-  clientId: number;
+  client: Client;
   employee: Employee;
   appointmentServices: {
     appointmentId: number;

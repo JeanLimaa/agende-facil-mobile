@@ -1,15 +1,9 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { View, ScrollView, Text } from "react-native";
-import { Appbar,  Button, Dialog, Portal, Divider } from "react-native-paper";
+import { Appbar, Button, Dialog, Portal, Divider } from "react-native-paper";
 import { router } from "expo-router";
-import api from "@/services/apiService";
-import { AxiosError, AxiosResponse } from "axios";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Client } from "../types/client.interface";
-import { Employee } from "../types/employee.interface";
-import { Service } from "../types/service.interface";
-import { Category } from "../types/category.interface"; 
-import { AppointmentEditResponse } from "../types/appointment.types";
+import { useQueryClient } from "@tanstack/react-query";
+
 import { appointmentFormStyle as styles } from "../styles/styles";
 import { EmployeeSelector } from "../components/EmployeeSelector";
 import { ClientSelector } from "../components/ClientSelector";
@@ -17,87 +11,58 @@ import { DatePicker, DateTimeSelector, TimePicker } from "../components/DateTime
 import { ServiceSelector } from "../components/ServiceSelector";
 import { SummaryShow } from "../components/SummaryShow";
 
-async function fetchAppointment(appointmentId: number): Promise<AppointmentEditResponse> {
-    const response = await api.get(`/appointment/${appointmentId}`);
-    return response.data;
-}
+import { useEmployees } from "../hooks/useEmployees";
+import { useCategoriesAndServices } from "../hooks/useCategoriesAndServices";
+import { useAppointmentEdit } from "../hooks/useAppointmentEdit";
 
-export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string}) {
+import api from "@/services/apiService";
+import { Client } from "../types/client.interface";
+import { Loading } from "@/components/Loading";
+import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+
+export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: string }) {
+  const queryClient = useQueryClient();
+  const apiErrorHandler = useApiErrorHandler();
+
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [time, setTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const [employees, setEmployees] = useState<Employee[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<number>();
-
   const [selectedClient, setSelectedClient] = useState<Client>();
-  const [services, setServices] = useState<Service[]>([]);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
-  const [categories, setCategories] = useState<Category[]>([{
-    id: 0,
-    name: "Todas",
-  }]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number>(0);
+  const [discount, setDiscount] = useState(0);
+  const [inputWidth, setInputWidth] = useState(0);
   const [showDialog, setShowDialog] = useState(false);
   const [menuVisible, setMenuVisible] = useState({ employee: false, client: false, category: false });
 
-  const [inputWidth, setInputWidth] = useState(0);
+  // Requisições
+  const { data: employeesData, isLoading: isLoadingEmployees } = useEmployees();
+  const { data: categoriesServicesData, isLoading: isLoadingCategoriesServices } = useCategoriesAndServices(!!selectedEmployee);
+  const { data: editItemData, isLoading: isLoadingEdit } = useAppointmentEdit(appointmentEditId);
 
-  const [discount, setDiscount] = useState(0);
+  const services = categoriesServicesData?.services || [];
+  const categories = categoriesServicesData?.categories || [];
+
+  // Valores calculados
   const subTotalPrice = useMemo(() => {
-    return services.filter(s => selectedServices.includes(s.id))
-    .reduce((sum, service) => sum + service.price, 0);
+    return services
+      .filter(service => selectedServices.includes(service.id))
+      .reduce((acc, curr) => acc + curr.price, 0);
   }, [selectedServices, services]);
-  const totalPrice = (subTotalPrice - discount) >= 0 ? subTotalPrice - discount : 0;
 
-  const queryClient = useQueryClient();
-  
+  const totalPrice = Math.max(subTotalPrice - discount, 0);
+
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const response = await api.get(`/employee/list/all`);
-        setEmployees(response.data);
-        
-        if (!(response.data.length > 0)) {
-          setShowDialog(true);
-          return;
-        };
-
-        setSelectedEmployee(response.data[0].id);
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          console.error(error?.response?.data);
-        }
-      }
-    };
-
-    fetchEmployees();
-  }, []);
-
-  // Mock de fetch de serviços quando funcionário é selecionado
-  useEffect(() => {
-    if (selectedEmployee) {
-      const fetchData = async () => {
-        try {
-          const categorysResponse: AxiosResponse<Category[]> = await api.get(`/category/list-all`);
-          const allCategories = {
-            id: 0,
-            name: "Todas",
-          };
-          setCategories([allCategories, ...categorysResponse.data]);
-
-          const servicesResponse = await api.get(`/service/list-all`);
-          setServices(servicesResponse.data)
-        } catch (error) {
-          if (error instanceof AxiosError) {
-            console.error(error?.response?.data);
-          }
-        }
-      };
-
-      fetchData();
+    if (editItemData) {
+      setSelectedEmployee(editItemData.employee.id);
+      setSelectedServices(editItemData.appointmentServices.map(s => s.serviceId));
+      setSelectedClient(editItemData.client);
+      setDate(editItemData.date.split('T')[0]);
+      setTime(new Date(editItemData.date));
     }
-  }, [selectedEmployee]);
+  }, [editItemData]);
 
   const handleSave = async () => {
     if (!date || !time || !selectedEmployee || !selectedClient || selectedServices.length === 0) {
@@ -106,40 +71,29 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
     }
 
     try {
-      await api.post('/appointment', {
+      const payload = {
         serviceId: selectedServices,
         employeeId: selectedEmployee,
         date: `${date}T${time.toISOString().split('T')[1]}`,
         clientId: selectedClient.id,
-      });
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        console.error(error?.response?.data);
-      }
-    };
-    
-    queryClient.invalidateQueries({ queryKey: ['appointments'] });
+        discount,
+      };
 
-    router.back();
+      if (appointmentEditId) {
+        await api.put(`/appointment/${appointmentEditId}`, payload);
+      } else {
+        await api.post(`/appointment`, payload);
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['appointments'] });
+      router.back();
+    } catch (error) {
+        apiErrorHandler(error);
+    }
   };
 
-  const { data: editItemData, isLoading, error } = useQuery({
-    queryKey: ['employees'],
-    queryFn: () => fetchAppointment(Number(appointmentEditId)),
-    enabled: !!appointmentEditId,
-  });
-
-  useEffect(() => {
-    if (editItemData?.employee) {
-      setSelectedEmployee(editItemData.employee.id);
-      setSelectedServices(editItemData.appointmentServices.map(s => s.serviceId));
-    }
-  }, [editItemData]);
+  if (isLoadingEmployees || isLoadingCategoriesServices || (appointmentEditId && isLoadingEdit)) return <Loading />;
   
-
-  if (isLoading) return <Text>Carregando...</Text>;
-  if (error) return <Text>Erro ao carregar os dados</Text>;
-
   return (
     <View style={styles.container}>
       <Appbar.Header style={styles.header}>
@@ -148,8 +102,8 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
       </Appbar.Header>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <EmployeeSelector 
-          employees={employees}
+        <EmployeeSelector
+          employees={employeesData || []}
           selectedEmployee={selectedEmployee}
           setSelectedEmployee={setSelectedEmployee}
           menuVisible={menuVisible}
@@ -157,7 +111,6 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
           inputWidth={inputWidth}
         />
 
-        {/* Seleção de Cliente */}
         <ClientSelector
           selectedClient={selectedClient}
           setSelectedClient={setSelectedClient}
@@ -166,8 +119,7 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
           inputWidth={inputWidth}
           setInputWidth={setInputWidth}
         />
-        
-        {/* Seleção de Data e Hora */}
+
         <DateTimeSelector
           date={date}
           time={time}
@@ -193,32 +145,25 @@ export function AppointmentForm({appointmentEditId}: {appointmentEditId?: string
           setDiscount={setDiscount}
         />
 
-        <Button 
-          mode="contained" 
-          onPress={handleSave}
-          style={styles.saveButton}
-        >
+        <Button mode="contained" onPress={handleSave} style={styles.saveButton}>
           Salvar
         </Button>
       </ScrollView>
 
-      {/* Date Picker */}
-      <DatePicker 
+      <DatePicker
         date={date}
         setDate={setDate}
         showDatePicker={showDatePicker}
         setShowDatePicker={setShowDatePicker}
       />
 
-      {/* Time Picker */}
-      <TimePicker 
-        showTimePicker={showTimePicker}
-        setShowTimePicker={setShowTimePicker}
+      <TimePicker
         time={time}
         setTime={setTime}
+        showTimePicker={showTimePicker}
+        setShowTimePicker={setShowTimePicker}
       />
 
-      {/* Dialog de Validação */}
       <Portal>
         <Dialog visible={showDialog} onDismiss={() => setShowDialog(false)}>
           <Dialog.Title>Atenção</Dialog.Title>
