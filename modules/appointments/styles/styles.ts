@@ -7,10 +7,10 @@ export const styles = StyleSheet.create({
       backgroundColor: "#EAEAEA",
     },
     header: {
-      backgroundColor: "#FF6600",
+      backgroundColor: Colors.light.mainColor,
     },
     toggleButton: {
-      backgroundColor: "#FF6600",
+      backgroundColor: Colors.light.mainColor,
       padding: 10,
       alignItems: "center",
     },
@@ -50,7 +50,7 @@ export const styles = StyleSheet.create({
       position: "absolute",
       right: 20,
       bottom: 20,
-      backgroundColor: "#FF6600",
+      backgroundColor: Colors.light.mainColor,
     },
     cardContainer: {
         margin: 10,
@@ -79,12 +79,17 @@ export const styles = StyleSheet.create({
 });
 
 export const appointmentFormStyle = StyleSheet.create({
+  selectedServiceItem: {
+      borderRadius: 8,
+      borderBottomColor: "purple",
+      borderBottomWidth: 2,
+  },
   container: {
     flex: 1,
     backgroundColor: "#EAEAEA",
   },
   header: {
-    backgroundColor: "#FF6600",
+    backgroundColor: Colors.light.mainColor,
   },
   content: {
     padding: 16,
@@ -136,7 +141,7 @@ export const appointmentFormStyle = StyleSheet.create({
   },
   saveButton: {
     marginTop: 16,
-    backgroundColor: "#FF6600",
+    backgroundColor: Colors.light.mainColor,
   },
   sectionContainer: {
     marginBottom: 6,

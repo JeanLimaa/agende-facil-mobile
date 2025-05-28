@@ -18,8 +18,9 @@ export function useCategoriesAndServices(enabled: boolean) {
       ]);
 
       const allCategories = { id: 0, name: 'Todas' };
+      const selectedCategories = { id: -1, name: 'Selecionados' };
       return {
-        categories: [allCategories, ...categoriesRes.data],
+        categories: [allCategories, selectedCategories, ...categoriesRes.data],
         services: servicesRes.data,
       };
     },

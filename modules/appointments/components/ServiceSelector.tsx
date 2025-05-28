@@ -8,70 +8,96 @@ import { textCapitalize } from "@/helpers/textCapitalize";
 import { useMemo } from "react";
 
 interface Props {
-    services: Service[];
-    categories: Category[];
-    selectedServices: number[];
-    setSelectedServices: (services: number[] | ((prev: number[]) => number[])) => void;
-    selectedCategoryId: number;
-    setSelectedCategoryId: (id: number) => void;
+  services: Service[];
+  categories: Category[];
+  selectedServices: number[];
+  setSelectedServices: (services: number[] | ((prev: number[]) => number[])) => void;
+  selectedCategoryId: number;
+  setSelectedCategoryId: (id: number) => void;
 }
 
 export function ServiceSelector({
-    services,
-    categories,
-    selectedServices,
-    setSelectedServices,
-    selectedCategoryId,
-    setSelectedCategoryId,
+  services,
+  categories,
+  selectedServices,
+  setSelectedServices,
+  selectedCategoryId,
+  setSelectedCategoryId,
 }: Props) {
-    const filteredServices = useMemo( 
-        () => services.filter(s => !selectedCategoryId || s.categoryId === selectedCategoryId),
-        [selectedCategoryId, services]
+  const filteredServices = useMemo(() => {
+    // Categoria "Selecionados"
+    if (selectedCategoryId === -1) {
+      return services.filter(service => selectedServices.includes(service.id));
+    }
+
+    // Categoria "Todas"
+    if (selectedCategoryId === 0) {
+      return services;
+    }
+
+    return services.filter(service => service.categoryId === selectedCategoryId)
+  },
+    [selectedCategoryId, services]
+  );
+
+  const toggleService = (serviceId: number) => {
+    setSelectedServices((prev: number[]) =>
+      prev.includes(serviceId)
+        ? prev.filter((id: number) => id !== serviceId)
+        : [...prev, serviceId]
     );
+  };
 
-    const toggleService = (serviceId: number) => {
-        setSelectedServices((prev: number[]) => 
-        prev.includes(serviceId)
-            ? prev.filter((id: number) => id !== serviceId)
-            : [...prev, serviceId]
-        );
-    };
+  return (
+    <View style={styles.sectionContainer}>
+      <Text style={styles.sectionLabel}>Serviços</Text>
 
-    return (
-        <View style={styles.sectionContainer}>
-          <Text style={styles.sectionLabel}>Serviços</Text>
+      {/* Filtro de Categoria */}
+      <View>
+        <Text style={styles.smallLabel}>Filtrar por categoria</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          style={styles.chipContainer}
+        >
+          {categories.map(category => {
+            const isSelectedCategory = selectedCategoryId === category.id;
+            const isSelecionados = category.id === -1;
 
-          {/* Filtro de Categoria */}
-          <View>
-            <Text style={styles.smallLabel}>Filtrar por categoria</Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false} 
-              style={styles.chipContainer}
-            >
-              {categories.map(category => (
-                <Chip
-                  key={category.id}
-                  selected={selectedCategoryId === category.id}
-                  onPress={() => setSelectedCategoryId(
-                    selectedCategoryId === category.id ? 0 : category.id
-                  )}
-                  style={[styles.chip, selectedCategoryId === category.id && styles.chipSelected]}
-                >
-                  {textCapitalize(category.name)}
-                </Chip>
-              ))}
-            </ScrollView>
-          </View>
+            const categoryLabel = isSelecionados
+              ? `${textCapitalize(category.name)} (${selectedServices.length})`
+              : textCapitalize(category.name);
 
-          {/* Lista de Serviços */}
-          {services.length === 0 ? <Text style={styles.mediumLabel}>Nenhum serviço encontrado</Text> : 
-            filteredServices
-            .map(service => (
+            return (
+              <Chip
+                key={category.id}
+                selected={isSelectedCategory}
+                onPress={() => setSelectedCategoryId(
+                  isSelectedCategory ? 0 : category.id
+                )}
+                style={[styles.chip, isSelectedCategory && styles.chipSelected]}
+              >
+                {categoryLabel}
+              </Chip>
+            );
+          })}
+        </ScrollView>
+      </View>
+
+      {/* Lista de Serviços */}
+      {services.length === 0 ? <Text style={styles.mediumLabel}>Nenhum serviço encontrado</Text> :
+        filteredServices
+          .map(service => {
+            const isSelected = selectedServices.includes(service.id);
+
+            return (
               <View key={service.id}>
-                <View style={styles.serviceItem}>
+                <View style={[
+                  styles.serviceItem,
+                  isSelected && styles.selectedServiceItem
+                ]}>
                   <Checkbox
-                    status={selectedServices.includes(service.id) ? 'checked' : 'unchecked'}
+                    status={isSelected ? 'checked' : 'unchecked'}
                     onPress={() => toggleService(service.id)}
                   />
                   <View style={styles.serviceInfo}>
@@ -81,11 +107,12 @@ export function ServiceSelector({
                 </View>
                 <Divider />
               </View>
-          ))}
-          {services.length > 0 && filteredServices.length === 0 ? 
-            <Text style={styles.mediumLabel}>Não há serviços cadastrados para essa categoria.</Text> 
-          : null}
-            
-        </View>
-    )
+            )
+          })}
+      {services.length > 0 && filteredServices.length === 0 ?
+        <Text style={styles.mediumLabel}>Não há serviços cadastrados para essa categoria.</Text>
+        : null}
+
+    </View>
+  )
 }
