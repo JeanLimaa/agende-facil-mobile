@@ -17,6 +17,16 @@ export interface IAppointment {
   client: Client
 }
 
+export interface IAppointmentMapped {
+  id: string;
+  date: string;
+  timeStart: string;
+  timeEnd: string;
+  client: string;
+  appointmentStatus: AppointmentStatus;
+  price: string;
+}
+
 export enum AppointmentStatus {
   PENDING = "Pendente",
   COMPLETED = "Concluído",
