@@ -10,10 +10,21 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { LoadingModal } from "@/components/LoadingModal";
 import { IAppointment } from "../types/appointment.types";
 import { AppointmentStatus } from "../types/appointment.types";
+import { AxiosResponse } from "axios";
 
-async function fetchAppointments() {
-  const response = await api.get("/appointment/company");
-  return response.data.map((item: any) => {
+interface IAppointmentMapped {
+  id: string;
+  date: string; // YYYY-MM-DD
+  timeStart: string; // HH:mm
+  timeEnd: string; // HH:mm
+  client: string;
+  appointmentStatus: AppointmentStatus;
+  price: string; // R$ xx,xx
+}
+
+async function fetchAppointments(): Promise<IAppointmentMapped[]> {
+  const response: AxiosResponse<IAppointment[]> = await api.get("/appointment/company");
+  return response.data.map((item) => {
     const dateObj = new Date(item.date);
     
     return {
@@ -29,7 +40,7 @@ async function fetchAppointments() {
 }
 
 // Função para agrupar os agendamentos por data E ordenamente do mais recente para o mais antigo
-const groupByDate = (appointments: IAppointment[]): { [key: string]: IAppointment[] } => {
+const groupByDate = (appointments: IAppointmentMapped[]): { [key: string]: IAppointmentMapped[] } => {
   const grouped = appointments.reduce((acc, appointment) => {
     const date = appointment.date; // "YYYY-MM-DD"
     if (!acc[date]) {
@@ -37,7 +48,7 @@ const groupByDate = (appointments: IAppointment[]): { [key: string]: IAppointmen
     }
     acc[date].push(appointment);
     return acc;
-  }, {} as Record<string, IAppointment[]>);
+  }, {} as Record<string, IAppointmentMapped[]>);
 
   // Ordena as chaves por data
   const sortedEntries = Object.entries(grouped).sort(([dateA], [dateB]) => 
@@ -54,11 +65,11 @@ export function AppointmentScreen() {
   const [showAll, setShowAll] = useState(false);
   const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
 
-  const [selectedAppointment, setSelectedAppointment] = useState<IAppointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<IAppointmentMapped | null>(null);
 
   const [isActionModalVisible, setIsActionModalVisible] = useState(false);
 
-  const { data, isLoading, error } = useQuery<IAppointment[]>({
+  const { data, isLoading, error } = useQuery<IAppointmentMapped[]>({
     queryKey: ["appointments"],
     queryFn: fetchAppointments,
     refetchInterval: 1 * 60 * 1000,
@@ -101,7 +112,7 @@ export function AppointmentScreen() {
     setSelectedAppointment(null);
   }
 
-  function openActionsModal(appointment: IAppointment) {
+  function openActionsModal(appointment: IAppointmentMapped) {
     setSelectedAppointment(appointment);
     setIsActionModalVisible(true);
   }

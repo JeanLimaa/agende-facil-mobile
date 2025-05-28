@@ -4,11 +4,17 @@ import { Employee } from "./employee.interface";
 export interface IAppointment {
   id: string;
   date: string;
-  timeStart: string;
-  timeEnd: string;
-  clientName: string;
   appointmentStatus: string;
   price: string;
+  status: AppointmentStatus;
+  clientId: number;
+  employeeId: number;
+  subTotalPrice: number;
+  discount: number;
+  totalPrice: number;
+  totalDuration: number;
+  clientName: string;
+  client: Client
 }
 
 export enum AppointmentStatus {
@@ -19,7 +25,6 @@ export enum AppointmentStatus {
 }
 
 export interface AppointmentEditResponse extends IAppointment {
-  client: Client;
   employee: Employee;
   appointmentServices: {
     appointmentId: number;
