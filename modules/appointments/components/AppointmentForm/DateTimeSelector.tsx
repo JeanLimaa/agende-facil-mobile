@@ -1,6 +1,6 @@
 import { TouchableOpacity, View, Text } from "react-native";
 import { Modal, Portal, TextInput } from "react-native-paper";
-import { appointmentFormStyle as styles } from "../styles/styles";
+import { appointmentFormStyle as styles } from "../../styles/styles";
 import { Calendar, DateData } from "react-native-calendars";
 import DateTimePicker from '@react-native-community/datetimepicker';
 

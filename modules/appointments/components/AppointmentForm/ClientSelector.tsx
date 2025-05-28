@@ -1,11 +1,11 @@
 import { View, Text, Modal, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { Button, TextInput, ActivityIndicator } from "react-native-paper";
-import { appointmentFormStyle as styles } from "../styles/styles";
-import { Client } from "../types/client.interface";
+import { appointmentFormStyle as styles } from "../../styles/styles";
+import { Client } from "../../types/client.interface";
 import { useState } from "react";
-import { useClients } from "../hooks/useClients";
+import { useClients } from "../../hooks/useClients";
 import { SelectableList } from "@/components/SelectableList";
-import { SelectableListModal } from "../../../components/SelectableListModal";
+import { SelectableListModal } from "../../../../components/SelectableListModal";
 
 interface Props {
   selectedClient?: Client;

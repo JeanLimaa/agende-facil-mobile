@@ -5,11 +5,11 @@ import { router } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { appointmentFormStyle as styles } from "../styles/styles";
-import { EmployeeSelector } from "../components/EmployeeSelector";
-import { ClientSelector } from "../components/ClientSelector";
-import { DatePicker, DateTimeSelector, TimePicker } from "../components/DateTimeSelector";
-import { ServiceSelector } from "../components/ServiceSelector";
-import { SummaryShow } from "../components/SummaryShow";
+import { EmployeeSelector } from "../components/AppointmentForm/EmployeeSelector";
+import { ClientSelector } from "../components/AppointmentForm/ClientSelector";
+import { DatePicker, DateTimeSelector, TimePicker } from "../components/AppointmentForm/DateTimeSelector";
+import { ServiceSelector } from "../components/AppointmentForm/ServiceSelector";
+import { SummaryShow } from "../components/AppointmentForm/SummaryShow";
 
 import { useEmployees } from "../hooks/useEmployees";
 import { useCategoriesAndServices } from "../hooks/useCategoriesAndServices";
