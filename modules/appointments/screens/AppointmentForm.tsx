@@ -61,6 +61,7 @@ export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: str
       setSelectedClient(editItemData.client);
       setDate(editItemData.date.split('T')[0]);
       setTime(new Date(editItemData.date));
+      setDiscount(editItemData.discount || 0);
     }
   }, [editItemData]);
 
