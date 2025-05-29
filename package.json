@@ -25,6 +25,7 @@
     "@tanstack/react-query": "^5.75.2",
     "agendefacil-mobile": "file:",
     "axios": "^1.8.3",
+    "date-fns": "^4.1.0",
     "expo": "~52.0.36",
     "expo-blur": "~14.0.3",
     "expo-constants": "~17.0.5",
