@@ -14,7 +14,7 @@ export default function AuthScreen({children}: {children: React.ReactNode}) {
   return (
     <View style={styles.mainContainer}>
       {/* Logo no topo */}
-      <Image source={require('../../../assets/images/logo.png')} style={styles.logo} />
+      <Image source={require('../../../../assets/images/logo.png')} style={styles.logo} />
 
       {/* Tab de Login e Cadastro */}
       <View style={styles.tabContainer}>
