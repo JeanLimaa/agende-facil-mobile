@@ -4,8 +4,8 @@ import HomeScreen from ".";
 import AppointmentPage from "./appointment";
 import NewAppointmentPage from "./appointment/new-appointment";
 import { Appbar } from "react-native-paper";
-import { Header } from "@/components/Header/Header";
-import { ProtectRoute } from "@/components/ProtectRoute";
+import { Header } from "@/shared/components/Header/Header";
+import { ProtectRoute } from "@/shared/components/ProtectRoute";
 import AppointmentEditPage from "./appointment/[appointmentEditId]";
 import BlockPage from "./appointment/block";
 

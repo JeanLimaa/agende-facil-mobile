@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import api from '@/services/apiService';
+import api from '@/shared/services/apiService';
 import { Category } from '../types/category.interface';
 import { Service } from '../types/service.interface';
 

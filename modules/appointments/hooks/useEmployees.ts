@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import api from '@/services/apiService';
+import api from '@/shared/services/apiService';
 import { Employee } from '../types/employee.interface';
 
 export function useEmployees() {

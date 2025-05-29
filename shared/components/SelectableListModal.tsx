@@ -1,7 +1,7 @@
 import { View, Modal } from "react-native";
 import { Button } from "react-native-paper";
-import { SelectableList } from "@/components/SelectableList";
-import { selectableModalStyles } from "../modules/appointments/styles/selectableModal";
+import { SelectableList } from "@/shared/components/SelectableList";
+import { selectableModalStyles } from "@/modules/appointments/styles/selectableModal";
 
 interface SelectableListModalProps<T extends { id: string | number; name: string }> {
   data: T[];

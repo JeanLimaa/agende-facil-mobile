@@ -15,10 +15,10 @@ import { useEmployees } from "../hooks/useEmployees";
 import { useCategoriesAndServices } from "../hooks/useCategoriesAndServices";
 import { useAppointmentEdit } from "../hooks/useAppointmentEdit";
 
-import api from "@/services/apiService";
+import api from "@/shared/services/apiService";
 import { Client } from "../types/client.interface";
-import { Loading } from "@/components/Loading";
-import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+import { Loading } from "@/shared/components/Loading";
+import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import { format } from "date-fns";
 import Toast from "react-native-toast-message";
 

@@ -1,13 +1,13 @@
 import { useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from "@/services/apiService";
+import api from "@/shared/services/apiService";
 import {  IAppointmentMapped } from "../types/appointment.types";
 import { AppointmentStatus } from "../types/appointment.types";
 import { router } from "expo-router";
 import { groupByDate } from "../helpers/appointments.helper";
 import { fetchAppointments } from "../services/fetchAppointments";
-import { showAlertForStatusCode } from "@/helpers/showAlertForStatusCode";
-import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+import { showAlertForStatusCode } from "@/shared/helpers/showAlertForStatusCode";
+import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import Toast from "react-native-toast-message";
 
 export function useAppointmentScreenLogic() {

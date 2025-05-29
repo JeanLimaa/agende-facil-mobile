@@ -4,8 +4,8 @@ import { appointmentFormStyle as styles } from "../../styles/styles";
 import { Client } from "../../types/client.interface";
 import { useState } from "react";
 import { useClients } from "../../hooks/useClients";
-import { SelectableList } from "@/components/SelectableList";
-import { SelectableListModal } from "../../../../components/SelectableListModal";
+import { SelectableList } from "@/shared/components/SelectableList";
+import { SelectableListModal } from "@/shared/components/SelectableListModal";
 
 interface Props {
   selectedClient?: Client;

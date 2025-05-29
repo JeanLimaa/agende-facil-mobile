@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Client } from "../types/client.interface";
-import api from "@/services/apiService";
+import api from "@/shared/services/apiService";
 
 async function fetchClients(): Promise<Client[]> {
     const response = await api.get("/clients");

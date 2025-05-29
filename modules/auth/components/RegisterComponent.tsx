@@ -3,11 +3,11 @@ import { Text, TextInput, Button, Alert } from 'react-native';
 import { IRegisterData } from '../interfaces/register.interface';
 import { IErrorDefault } from '../interfaces/error.interface';
 import { styles } from '../styles/styles';
-import { BASE_URL } from "@/constants/apiUrl";
+import { BASE_URL } from "@/shared/constants/apiUrl";
 import { useAuth } from '../contexts/AuthContext';
 import { InputIconContainer } from './InputIconContainer';
 import { Entypo, Feather } from '@expo/vector-icons';
-import { Colors } from '@/constants/Colors';
+import { Colors } from '@/shared/constants/Colors';
 export function RegisterComponent() {
   const { login } = useAuth();
   const [data, setData] = useState<IRegisterData>({ email: '', password: '', phone: '', name: '' });

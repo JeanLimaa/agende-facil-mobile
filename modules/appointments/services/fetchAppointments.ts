@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios";
 import { IAppointment, IAppointmentMapped } from "../types/appointment.types";
-import api from "@/services/apiService";
+import api from "@/shared/services/apiService";
 import { format } from "date-fns";
 
 export async function fetchAppointments(): Promise<IAppointmentMapped[]> {

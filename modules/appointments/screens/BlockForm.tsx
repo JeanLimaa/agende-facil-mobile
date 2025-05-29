@@ -6,10 +6,10 @@ import { useQueryClient } from "@tanstack/react-query";
 import { appointmentFormStyle as styles } from "../styles/styles";
 import { EmployeeSelector } from "../components/AppointmentForm/EmployeeSelector";
 import { DatePicker, DateTimeSelector, TimePicker } from "../components/AppointmentForm/DateTimeSelector";
-import api from "@/services/apiService";
+import api from "@/shared/services/apiService";
 import { useEmployees } from "../hooks/useEmployees";
-import { Loading } from "@/components/Loading";
-import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+import { Loading } from "@/shared/components/Loading";
+import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import Toast from "react-native-toast-message";
 
 export function BlockForm() {

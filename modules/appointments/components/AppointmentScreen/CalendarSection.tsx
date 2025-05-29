@@ -1,7 +1,7 @@
 import React from "react";
 import { Calendar } from "react-native-calendars";
 import { styles } from "../../styles/styles";
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/shared/constants/Colors";
 
 export function CalendarSection({
   isExpanded,

@@ -1,7 +1,7 @@
 import { View, Text } from "react-native";
 import { appointmentFormStyle as styles } from "../../styles/styles";
 import MaskInput, { Masks } from "react-native-mask-input";
-import { formatToCurrency } from "@/helpers/formatValue";
+import { formatToCurrency } from "@/shared/helpers/formatValue";
 import { useEffect } from "react";
 
 interface Props {

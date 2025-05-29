@@ -4,10 +4,10 @@ import { TextInput, Text, Button } from "react-native";
 import { styles } from "../styles/styles";
 import React from "react";
 import { useAuth } from "@/modules/auth/contexts/AuthContext";
-import { BASE_URL } from "@/constants/apiUrl";
+import { BASE_URL } from "@/shared/constants/apiUrl";
 import {Entypo, Feather} from '@expo/vector-icons/';
 import { InputIconContainer } from "./InputIconContainer";
-import { Colors } from "@/constants/Colors";
+import { Colors } from "@/shared/constants/Colors";
 
 export function LoginComponent() {
   const { login } = useAuth();

@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import { appointmentFormStyle as styles } from "../../styles/styles";
 import { Employee } from "../../types/employee.interface";
 import { Button } from "react-native-paper";
-import { SelectableListModal } from "../../../../components/SelectableListModal";
+import { SelectableListModal } from "@/shared/components/SelectableListModal";
 
 interface Props {
   employees: Employee[];
