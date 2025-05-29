@@ -16,9 +16,9 @@ export function CalendarSection({
   return (
     <Calendar
       onDayPress={onDayPress}
-      markedDates={{ [selectedDate]: { selected: true, selectedColor: Colors.light.background } }}
+      markedDates={{ [selectedDate]: { selected: true, selectedColor: Colors.light.mainColor } }}
       style={styles.calendar}
-      theme={{ selectedDayBackgroundColor: Colors.light.background , todayTextColor: Colors.light.background  }}
+      theme={{ selectedDayBackgroundColor: Colors.light.mainColor , todayTextColor: Colors.light.mainColor  }}
     />
   );
 }
