@@ -1,5 +1,7 @@
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import HomeScreen from ".";
 import AppointmentPage from "./appointment";
 import NewAppointmentPage from "./appointment/new-appointment";
@@ -8,6 +10,15 @@ import { Header } from "@/shared/components/Header/Header";
 import { ProtectRoute } from "@/shared/components/ProtectRoute";
 import AppointmentEditPage from "./appointment/[appointmentEditId]";
 import BlockPage from "./appointment/block";
+import { Colors } from '@/shared/constants/Colors';
+import { useAuth } from '@/modules/auth/contexts/AuthContext';
+import { useMe } from '@/shared/hooks/queries/useMe';
+import { Loading } from '@/shared/components/Loading';
+import ErrorScreen from '../ErrorScreen';
+
+const ClientesPage = () => <View><Text>Clientes Screen</Text></View>;
+const ConfiguracoesPage = () => <View><Text>Configurações Screen</Text></View>;
+const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -23,9 +34,67 @@ function StackNavigator() {
   );
 }
 
+function CustomDrawerContent(props: any) {
+  const { logout } = useAuth();
+
+  const {data: user, isLoading: userInfoLoading, error, refetch } = useMe();
+  if(error) return <ErrorScreen onRetry={refetch} />
+
+  const handleMyLink = () => {
+    console.log("Meu link pressed");
+    props.navigation.closeDrawer();
+  };
+
+  return (
+    <View style={{ flex: 1, backgroundColor: Colors.light.background }}>
+      <DrawerContentScrollView {...props}>
+        <View style={styles.drawerHeader}>
+          <Image
+            source={require('../../../assets/images/icon.png')}
+            style={styles.logo}
+          />
+          <View>
+            {userInfoLoading ? <Loading /> : (
+              <>
+                <Text style={styles.companyName}>{user?.companyName}</Text>
+                <Text style={styles.userName}>{user?.name}</Text>
+              </>
+            )}
+          </View>
+        </View>
+
+        <DrawerItemList {...props} />
+
+        <DrawerItem
+          label="Meu link"
+          labelStyle={{ color: Colors.light.text }}
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="link-variant" color={color} size={size} />
+          )}
+          onPress={handleMyLink}
+        />
+
+      </DrawerContentScrollView>
+
+      <View style={styles.logoutSection}>
+        <DrawerItem
+          label="Sair"
+          labelStyle={{ color: Colors.light.text }}
+          icon={({ color, size }) => (
+            <MaterialCommunityIcons name="logout" color={color} size={size} />
+          )}
+          onPress={logout}
+        />
+      </View>
+
+    </View>
+  );
+}
+
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerStyle: { width: "80%" },
         header: ({ navigation }) => (
@@ -33,10 +102,60 @@ function DrawerNavigator() {
             <Appbar.Content title="Agende Fácil" />
           </Header>
         ),
+        drawerActiveTintColor: Colors.light.mainColor,
+        drawerInactiveTintColor: Colors.light.text,
       }}
     >
-      <Drawer.Screen name="Inicio" component={HomeScreen} />
-      <Drawer.Screen name="Agendamentos" component={AppointmentPage} />
+      <Drawer.Screen
+        name="Inicio"
+        component={HomeScreen}
+        options={{
+          title: "Início",
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="home-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Agendamentos"
+        component={AppointmentPage}
+        options={{
+          title: "Agendamentos",
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="calendar-check-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Clientes"
+        component={ClientesPage}
+        options={{
+          title: "Clientes",
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="account-group-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Configuracoes"
+        component={ConfiguracoesPage}
+        options={{
+          title: "Configurações",
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="cog-outline" color={color} size={size} />
+          ),
+        }}
+      />
+      <Drawer.Screen
+        name="Subscription"
+        component={SubscriptionPage}
+        options={{
+          title: "Assinatura",
+          drawerIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="credit-card-outline" color={color} size={size} />
+          ),
+        }}
+      />
     </Drawer.Navigator>
   );
 }
@@ -48,3 +167,34 @@ export default function TabsLayout() {
     </ProtectRoute>
   );
 }
+
+const styles = StyleSheet.create({
+  drawerHeader: {
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  logo: {
+    width: 50,
+    height: 50,
+    marginRight: 15,
+  },
+  companyName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.light.text,
+  },
+  userName: {
+    fontSize: 14,
+    color: Colors.light.textSecondary,
+  },
+  logoutSection: {
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
+    paddingVertical: 10,
+  },
+});

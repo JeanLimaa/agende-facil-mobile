@@ -9,7 +9,7 @@ const HomeScreen = () => {
     return (
         <View style={styles.container}>
             <Text style={styles.text}>Welcome to AgendeFacil!!!</Text>
-            <Link href="/(tabs)/schedule">Schedule</Link>
+            <Link href="/(tabs)/appointment">Schedule</Link>
             <Button title="Logout" onPress={logout} />
         </View>
     );
