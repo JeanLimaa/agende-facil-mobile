@@ -7,6 +7,7 @@ import { Appbar } from "react-native-paper";
 import { Header } from "@/components/Header/Header";
 import { ProtectRoute } from "@/components/ProtectRoute";
 import AppointmentEditPage from "./appointment/[appointmentEditId]";
+import BlockPage from "./appointment/block";
 
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -17,6 +18,7 @@ function StackNavigator() {
       <Stack.Screen name="DrawerScreens" component={DrawerNavigator} />
       <Stack.Screen name="appointment/new-appointment" component={NewAppointmentPage} />
       <Stack.Screen name="appointment/[appointmentEditId]" component={AppointmentEditPage} />
+      <Stack.Screen name="appointment/block" component={BlockPage} />
     </Stack.Navigator>
   );
 }

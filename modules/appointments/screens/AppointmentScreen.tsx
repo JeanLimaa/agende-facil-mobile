@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
 import { FAB, Text } from "react-native-paper";
 import { CalendarToggle } from "../components/AppointmentScreen/CalendarToggle";
@@ -14,9 +14,19 @@ import { router } from "expo-router";
 
 export function AppointmentScreen() {
   const logic = useAppointmentScreenLogic();
+  const [fabModalVisible, setFabModalVisible] = useState(false);
 
   if (logic.isLoading) return <LoadingModal visible={logic.isLoading} />;
   if (logic.error) return <Text>Erro ao carregar os agendamentos.</Text>;
+
+  function handleFabOption(option: "new" | "block") {
+    setFabModalVisible(false);
+    if (option === "new") {
+      router.push("/(tabs)/appointment/new-appointment");
+    } else if (option === "block") {
+      router.push("/(tabs)/appointment/block");
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -40,7 +50,24 @@ export function AppointmentScreen() {
       <FAB
         style={styles.fab}
         icon="plus"
-        onPress={() => router.push("/(tabs)/appointment/new-appointment")}
+        onPress={() => setFabModalVisible(true)}
+      />
+      <ActionsModal
+        visible={fabModalVisible}
+        onClose={() => setFabModalVisible(false)}
+        title="O que deseja fazer?"
+        options={[
+          {
+            label: "Novo Agendamento",
+            action: () => handleFabOption("new"),
+            icon: { name: "add", family: "MaterialIcons" },
+          },
+          {
+            label: "Bloquear Agenda",
+            action: () => handleFabOption("block"),
+            icon: { name: "block", family: "MaterialIcons" },
+          },
+        ]}
       />
       <ActionsModal
         visible={!!logic.selectedAppointment && logic.isActionModalVisible}
