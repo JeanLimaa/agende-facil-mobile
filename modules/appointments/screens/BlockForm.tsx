@@ -10,6 +10,7 @@ import api from "@/services/apiService";
 import { useEmployees } from "../hooks/useEmployees";
 import { Loading } from "@/components/Loading";
 import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+import Toast from "react-native-toast-message";
 
 export function BlockForm() {
   const queryClient = useQueryClient();
@@ -28,7 +29,6 @@ export function BlockForm() {
   const [showDialog, setShowDialog] = useState(false);
   const [menuVisible, setMenuVisible] = useState({ employee: false, client: false, category: false });
   const [sameDay, setSameDay] = useState(true);
-  console.log(endTime, startTime, endTime.toISOString(), endTime.toLocaleTimeString('pt-BR'));
 
   const { data: employeesData, isLoading: isLoadingEmployees } = useEmployees();
 
@@ -59,6 +59,15 @@ export function BlockForm() {
         employeeId: selectedEmployee,
       });
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
+
+      Toast.show({
+        type: 'success',
+        text1: 'Bloqueio criado com sucesso!',
+        text2: 'A agenda foi bloqueada para o período selecionado.',
+        swipeable: true,
+        position: 'bottom',
+      });
+      
       router.back();
     } catch (error) {
       apiErrorHandler(error);

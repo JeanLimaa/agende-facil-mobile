@@ -7,6 +7,8 @@ import { router } from "expo-router";
 import { groupByDate } from "../helpers/appointments.helper";
 import { fetchAppointments } from "../services/fetchAppointments";
 import { showAlertForStatusCode } from "@/helpers/showAlertForStatusCode";
+import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+import Toast from "react-native-toast-message";
 
 export function useAppointmentScreenLogic() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split("T")[0]);
@@ -15,6 +17,7 @@ export function useAppointmentScreenLogic() {
   const [isCancelDialogVisible, setIsCancelDialogVisible] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<IAppointmentMapped | null>(null);
   const [isActionModalVisible, setIsActionModalVisible] = useState(false);
+  const apiErrorHandler = useApiErrorHandler();
 
   const { data, isLoading, error } = useQuery<IAppointmentMapped[]>({
     queryKey: ["appointments"],
@@ -37,9 +40,15 @@ export function useAppointmentScreenLogic() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["appointments"] });
+      Toast.show({
+        type: "success",
+        text1: "Sucesso",
+        text2: "Status do agendamento atualizado com sucesso.",
+        position: "bottom",
+      })
     },
     onError: (error) => {
-      alert("Erro ao marcar agendamento como atendido. Por favor, tente novamente.");
+      apiErrorHandler(error);
       console.error(error);
     },
   });
@@ -66,7 +75,7 @@ export function useAppointmentScreenLogic() {
 
   const handleEdit = useCallback(() => {
     if (!selectedAppointment) {
-      alert("Nenhum agendamento selecionado.");
+      showAlertForStatusCode(400, "Nenhum agendamento selecionado.");
       return;
     }
 
@@ -92,10 +101,10 @@ export function useAppointmentScreenLogic() {
   const toggleAttended = useCallback(
     async (status: "complete" | "cancel") => {
       if (!selectedAppointment) {
-        //alert("Nenhum agendamento selecionado.");
-        showAlertForStatusCode(404, "Nenhum agendamento selecionado.");
+        showAlertForStatusCode(400, "Nenhum agendamento selecionado.");
         return;
       }
+
       await changeAppointmentStatus.mutateAsync({ appointmentId: selectedAppointment.id, status });
       closeActionsModal();
     },
@@ -111,6 +120,7 @@ export function useAppointmentScreenLogic() {
   const actionOptions = [];
   if (selectedAppointment) {
     actionOptions.push({ label: "Editar", action: handleEdit, icon: { name: "edit" } });
+
     if (
       selectedAppointment.appointmentStatus.toLowerCase() !==
       AppointmentStatus.COMPLETED.toLowerCase()
@@ -121,6 +131,7 @@ export function useAppointmentScreenLogic() {
         icon: { name: "check-circle" },
       });
     }
+
     if (
       selectedAppointment.appointmentStatus.toLowerCase() ===
       AppointmentStatus.PENDING.toLowerCase()

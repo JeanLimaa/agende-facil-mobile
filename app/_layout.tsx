@@ -5,6 +5,7 @@ import React from 'react';
 import { AuthProvider } from '@/modules/auth/contexts/AuthContext';
 import { PaperProvider } from 'react-native-paper';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,8 @@ export default function RootLayout() {
         </Stack>
         </PaperProvider>
       </AuthProvider>
+
+      <Toast /> 
     </QueryClientProvider>
   );
 }

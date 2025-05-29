@@ -20,6 +20,7 @@ import { Client } from "../types/client.interface";
 import { Loading } from "@/components/Loading";
 import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
 import { format } from "date-fns";
+import Toast from "react-native-toast-message";
 
 export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: string }) {
   const queryClient = useQueryClient();
@@ -86,6 +87,14 @@ export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: str
       } else {
         await api.post(`/appointment`, payload);
       }
+
+      Toast.show({
+        type: 'success',
+        text1: appointmentEditId ? 'Agendamento atualizado com sucesso!' : 'Agendamento criado com sucesso!',
+        text2: 'O agendamento foi salvo com sucesso.',
+        swipeable: true,
+        position: 'bottom',
+      })
 
       queryClient.invalidateQueries({ queryKey: ['appointments'] });
       router.back();
