@@ -3,12 +3,17 @@ import { Modal, Portal, TextInput } from "react-native-paper";
 import { appointmentFormStyle as styles } from "../../styles/styles";
 import { Calendar, DateData } from "react-native-calendars";
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import {format} from 'date-fns';
+import { formatDate } from "../../helpers/date.helper";
 interface DateTimeSelectorProps {
     date: string;
     time: Date;
     setShowDatePicker: (show: boolean) => void;
     setShowTimePicker: (show: boolean) => void;
+
+    showDateSelector?: boolean;
+    showTimeSelector?: boolean;
+    message?: string;
 }
 
 export function DateTimeSelector({
@@ -16,37 +21,40 @@ export function DateTimeSelector({
     time,
     setShowDatePicker,
     setShowTimePicker,
+    showDateSelector = true,
+    showTimeSelector = true,
+    message = "Data e Horário",
 }: DateTimeSelectorProps ) {
     return (
         <View style={styles.sectionContainer}>
-            <Text style={styles.sectionLabel}>Data e Horário</Text>
+            <Text style={styles.sectionLabel}>{message}</Text>
 
             <View style={styles.row}>
-                <TouchableOpacity
+                {showDateSelector && <TouchableOpacity
                     onPress={() => setShowDatePicker(true)}
                     activeOpacity={0.8}
                     style={styles.flex}
                 >
                     <TextInput
                         label="Data"
-                        value={date.split('-').reverse().join('/')}
+                        value={formatDate(date)}
                         right={<TextInput.Icon icon="calendar" onPress={() => setShowDatePicker(true)} />}
                         editable={false}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity>}
 
-                <TouchableOpacity
+                {showTimeSelector && <TouchableOpacity
                     onPress={() => setShowTimePicker(true)}
                     activeOpacity={0.8}
                     style={styles.flex}
                 >
                     <TextInput
                         label="Horário"
-                        value={time.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                        value={format(time, 'HH:mm')}
                         right={<TextInput.Icon icon="clock" onPress={() => setShowTimePicker(true)} />}
                         editable={false}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity>}
             </View>
         </View>
     )

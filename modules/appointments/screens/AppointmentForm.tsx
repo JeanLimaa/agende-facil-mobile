@@ -19,12 +19,13 @@ import api from "@/services/apiService";
 import { Client } from "../types/client.interface";
 import { Loading } from "@/components/Loading";
 import { useApiErrorHandler } from "@/hooks/useApiErrorHandler";
+import { format } from "date-fns";
 
 export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: string }) {
   const queryClient = useQueryClient();
   const apiErrorHandler = useApiErrorHandler();
 
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(format(new Date(), 'yyyy-MM-dd'));
   const [time, setTime] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -59,7 +60,7 @@ export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: str
       setSelectedEmployee(editItemData.employee.id);
       setSelectedServices(editItemData.appointmentServices.map(s => s.serviceId));
       setSelectedClient(editItemData.client);
-      setDate(editItemData.date.split('T')[0]);
+      setDate(format(editItemData.date, 'yyyy-MM-dd'));
       setTime(new Date(editItemData.date));
       setDiscount(editItemData.discount || 0);
     }

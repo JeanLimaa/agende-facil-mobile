@@ -4,7 +4,8 @@ import { Text, Card } from "react-native-paper";
 import { styles } from "../../styles/styles";
 import { AppointmentStatus } from "../../types/appointment.types";
 import { getStatusBorderColor } from "../../helpers/appointments.helper";
-
+import { format, parseISO } from "date-fns";
+import { ptBR } from "date-fns/locale";
 interface IAppointmentMapped {
   id: string;
   date: string;
@@ -37,12 +38,7 @@ export function AppointmentList({
         renderItem={({ item: date }) => (
           <View style={styles.dateSection}>
             <Text style={styles.dateText}>
-              {new Date(date).toLocaleDateString("pt-BR", {
-                weekday: "long",
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              })}
+              {format(parseISO(date), "EEEE, dd/MM/yyyy", {locale: ptBR})}
             </Text>
             {groupedAppointments[date].map((item) => (
               <Card
