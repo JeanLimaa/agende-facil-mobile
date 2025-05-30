@@ -1,12 +1,12 @@
 import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerItem } from '@react-navigation/drawer';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, Modal, Button } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import HomeScreen from ".";
 import AppointmentPage from "./appointment";
 import NewAppointmentPage from "./appointment/new-appointment";
 import { Appbar } from "react-native-paper";
-import { Header } from "@/shared/components/Header/Header";
+import { Header } from "@/shared/components/header/Header";
 import { ProtectRoute } from "@/shared/components/ProtectRoute";
 import AppointmentEditPage from "./appointment/[appointmentEditId]";
 import BlockPage from "./appointment/block";
@@ -15,6 +15,9 @@ import { useAuth } from '@/modules/auth/contexts/AuthContext';
 import { useMe } from '@/shared/hooks/queries/useMe';
 import { Loading } from '@/shared/components/Loading';
 import ErrorScreen from '../ErrorScreen';
+import { useState } from 'react';
+import { MyLink } from '@/modules/my-link/MyLink';
+import { SuspenseLoading } from '@/shared/components/SuspenseLoading';
 
 const ClientesPage = () => <View><Text>Clientes Screen</Text></View>;
 const ConfiguracoesPage = () => <View><Text>Configurações Screen</Text></View>;
@@ -36,13 +39,13 @@ function StackNavigator() {
 
 function CustomDrawerContent(props: any) {
   const { logout } = useAuth();
+  const { data: user, isLoading: userInfoLoading, error, refetch } = useMe();
+  const [myLinkModalVisible, setMyLinkModalVisible] = useState(false);
 
-  const {data: user, isLoading: userInfoLoading, error, refetch } = useMe();
-  if(error) return <ErrorScreen onRetry={refetch} />
+  if (error || !user) return <ErrorScreen onRetry={refetch} />;
 
   const handleMyLink = () => {
-    console.log("Meu link pressed");
-    props.navigation.closeDrawer();
+    setMyLinkModalVisible(true);
   };
 
   return (
@@ -54,12 +57,13 @@ function CustomDrawerContent(props: any) {
             style={styles.logo}
           />
           <View>
-            {userInfoLoading ? <Loading /> : (
-              <>
-                <Text style={styles.companyName}>{user?.companyName}</Text>
-                <Text style={styles.userName}>{user?.name}</Text>
-              </>
-            )}
+            <SuspenseLoading
+              isLoading={userInfoLoading}
+              fallback={<Loading />}
+            >
+              <Text style={styles.companyName}>{user.companyName}</Text>
+              <Text style={styles.userName}>{user.name}</Text>
+            </SuspenseLoading>
           </View>
         </View>
 
@@ -87,6 +91,10 @@ function CustomDrawerContent(props: any) {
         />
       </View>
 
+      <MyLink
+        visible={myLinkModalVisible}
+        onClose={() => setMyLinkModalVisible(false)}
+      />
     </View>
   );
 }
