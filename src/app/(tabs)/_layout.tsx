@@ -2,7 +2,6 @@ import { createDrawerNavigator, DrawerContentScrollView, DrawerItemList, DrawerI
 import { createStackNavigator } from '@react-navigation/stack';
 import { View, Text, Image, StyleSheet, Modal, Button } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import HomeScreen from ".";
 import AppointmentPage from "./appointment";
 import NewAppointmentPage from "./appointment/new-appointment";
 import { Appbar } from "react-native-paper";
@@ -114,16 +113,6 @@ function DrawerNavigator() {
         drawerInactiveTintColor: Colors.light.text,
       }}
     >
-      <Drawer.Screen
-        name="Inicio"
-        component={HomeScreen}
-        options={{
-          title: "Início",
-          drawerIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="home-outline" color={color} size={size} />
-          ),
-        }}
-      />
       <Drawer.Screen
         name="Agendamentos"
         component={AppointmentPage}

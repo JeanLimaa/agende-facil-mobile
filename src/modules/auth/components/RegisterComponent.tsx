@@ -8,6 +8,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { InputIconContainer } from './InputIconContainer';
 import { Entypo, Feather } from '@expo/vector-icons';
 import { Colors } from '@/shared/constants/Colors';
+import Toast from 'react-native-toast-message';
+
 export function RegisterComponent() {
   const { login } = useAuth();
   const [data, setData] = useState<IRegisterData>({ email: '', password: '', phone: '', name: '' });
@@ -31,7 +33,10 @@ export function RegisterComponent() {
         return;
       }
       
-      Alert.alert('Cadastro realizado', 'Usuário cadastrado com sucesso!');
+      Toast.show({
+        type: 'success',
+        text1: 'Cadastro realizado com sucesso!',
+      });
 
       const responseData: {access_token: string} = await response.json();
       login(responseData.access_token);
