@@ -17,6 +17,7 @@ interface ActionsModalProps {
   onClose: () => void;
   title: string;
   options: ActionItem[];
+  Header?: React.ReactNode;
 }
 
 const getIconComponent = (family: IconFamily) => {
@@ -32,12 +33,12 @@ const getIconComponent = (family: IconFamily) => {
   }
 };
 
-export const ActionsModal = ({ visible, onClose, title, options }: ActionsModalProps) => {
+export const ActionsModal = ({ visible, onClose, title, options, Header }: ActionsModalProps) => {
   return (
     <Modal visible={visible} transparent animationType="slide">
       <TouchableOpacity style={styles.overlay} onPress={onClose} activeOpacity={1}>
         <TouchableOpacity style={styles.modal} activeOpacity={1}>
-          <Text style={styles.modalTitle}>{title}</Text>
+          {Header ? Header : <Text style={styles.modalTitle}>{title}</Text>}
 
           {options.map((opt, index) => {
             const IconComponent = getIconComponent(opt.icon?.family ?? 'MaterialIcons');
