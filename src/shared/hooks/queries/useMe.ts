@@ -1,5 +1,5 @@
 import api from "@/shared/services/apiService";
-import { MePayload } from "@/shared/types/me.interface";
+import { MePayload } from "@/shared/types/MePayload.interface";
 import { useQuery } from "@tanstack/react-query";
 
 export const myQueryKey = "me";

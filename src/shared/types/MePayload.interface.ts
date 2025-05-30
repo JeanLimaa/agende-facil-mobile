@@ -3,4 +3,5 @@ export interface MePayload {
     name: string;
     phone: string;
     companyName: string;
+    companyLink: string;
 }
