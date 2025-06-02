@@ -1,9 +1,9 @@
 import { View, Text, Modal, FlatList, TouchableOpacity, StyleSheet } from "react-native";
 import { Button, TextInput, ActivityIndicator } from "react-native-paper";
 import { appointmentFormStyle as styles } from "../../styles/styles";
-import { Client } from "../../types/client.interface";
+import { Client } from "@/shared/types/client.interface";
 import { useState } from "react";
-import { useClients } from "../../hooks/useClients";
+import { useClients } from "@/shared/hooks/queries/useClients";
 import { SelectableList } from "@/shared/components/SelectableList";
 import { SelectableListModal } from "@/shared/components/SelectableListModal";
 
