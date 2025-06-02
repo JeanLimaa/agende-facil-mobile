@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Modal, StyleSheet, TouchableOpacity, Text, TextStyle } from 'react-native';
-import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
+import { MaterialIcons, Ionicons, Feather, FontAwesome } from '@expo/vector-icons';
 
-type IconFamily = 'MaterialIcons' | 'Ionicons' | 'Feather';
+type IconFamily = 'MaterialIcons' | 'Ionicons' | 'Feather' | 'FontAwesome';
 
 interface ActionItem {
   label: string;
@@ -28,6 +28,8 @@ const getIconComponent = (family: IconFamily) => {
       return Ionicons;
     case 'Feather':
       return Feather;
+    case 'FontAwesome':
+      return FontAwesome;
     default:
       return MaterialIcons;
   }
