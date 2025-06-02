@@ -17,8 +17,11 @@ import ErrorScreen from '../ErrorScreen';
 import { useState } from 'react';
 import { MyLink } from '@/modules/my-link/MyLink';
 import { SuspenseLoading } from '@/shared/components/SuspenseLoading';
+import ClientsPage from "./clients";
+import NewClientPage from './clients/new';
+import ImportContactsPage from './clients/import';
+import EditClientPage from './clients/edit';
 
-const ClientesPage = () => <View><Text>Clientes Screen</Text></View>;
 const ConfiguracoesPage = () => <View><Text>Configurações Screen</Text></View>;
 const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
 
@@ -32,6 +35,10 @@ function StackNavigator() {
       <Stack.Screen name="appointment/new-appointment" component={NewAppointmentPage} />
       <Stack.Screen name="appointment/[appointmentEditId]" component={AppointmentEditPage} />
       <Stack.Screen name="appointment/block" component={BlockPage} />
+
+      <Stack.Screen name="clients/new" component={NewClientPage} />
+      <Stack.Screen name="clients/edit" component={EditClientPage} />
+      <Stack.Screen name="clients/import" component={ImportContactsPage} />
     </Stack.Navigator>
   );
 }
@@ -101,6 +108,7 @@ function CustomDrawerContent(props: any) {
 function DrawerNavigator() {
   return (
     <Drawer.Navigator
+      initialRouteName='Agendamentos'
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerStyle: { width: "80%" },
@@ -124,8 +132,8 @@ function DrawerNavigator() {
         }}
       />
       <Drawer.Screen
-        name="Clientes"
-        component={ClientesPage}
+        name="Clients"
+        component={ClientsPage}
         options={{
           title: "Clientes",
           drawerIcon: ({ color, size }) => (
