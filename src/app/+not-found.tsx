@@ -12,7 +12,7 @@ export default function NotFoundScreen() {
         <Text style={{ fontSize: 18, marginBottom: 20, textAlign: 'center' }}>
           Ops! A página que você procura não foi encontrada.
         </Text>
-        <Link href="/" style={styles.link}>
+        <Link href="/(tabs)/appointment" style={styles.link}>
           <Text style={{ color: '#007AFF', fontSize: 16 }}>Voltar para a tela inicial</Text>
         </Link>
       </View>
