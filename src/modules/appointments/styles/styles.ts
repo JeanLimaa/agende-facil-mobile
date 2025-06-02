@@ -88,9 +88,6 @@ export const appointmentFormStyle = StyleSheet.create({
     flex: 1,
     backgroundColor: "#EAEAEA",
   },
-  header: {
-    backgroundColor: Colors.light.mainColor,
-  },
   content: {
     padding: 16,
   },

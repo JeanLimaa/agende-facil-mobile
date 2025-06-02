@@ -16,11 +16,12 @@ import { useCategoriesAndServices } from "../hooks/useCategoriesAndServices";
 import { useAppointmentEdit } from "../hooks/useAppointmentEdit";
 
 import api from "@/shared/services/apiService";
-import { Client } from "../types/client.interface";
+import { Client } from "@/shared/types/client.interface";
 import { Loading } from "@/shared/components/Loading";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import { format } from "date-fns";
 import Toast from "react-native-toast-message";
+import { AppBarHeader } from "@/shared/components/AppBarHeader";
 
 export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: string }) {
   const queryClient = useQueryClient();
@@ -107,10 +108,7 @@ export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: str
   
   return (
     <View style={styles.container}>
-      <Appbar.Header style={styles.header}>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Novo Agendamento" />
-      </Appbar.Header>
+      <AppBarHeader message="Novo agendamento" />
 
       <ScrollView contentContainerStyle={styles.content}>
         <EmployeeSelector
