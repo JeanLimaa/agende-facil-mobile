@@ -26,10 +26,7 @@ export function ClientFormScreen({
   const clientEditQuery = useClientById(Number(clientId));
 
   const isEdit = Boolean(clientId);
-
-  if (isEdit && clientEditQuery?.isLoading) return <Loading />;
-  if (isEdit && clientEditQuery?.error) return <ErrorScreen onRetry={clientEditQuery?.refetch} />;
-
+  
   useEffect(() => {
     if (isEdit && clientEditQuery && clientEditQuery.data && !Array.isArray(clientEditQuery.data) && !hasLoaded.current) {
       const client = clientEditQuery.data;
@@ -38,6 +35,9 @@ export function ClientFormScreen({
       setEmail(client?.email || "");
     }
   }, [isEdit, clientEditQuery?.data]);
+  
+  if (isEdit && clientEditQuery?.isLoading) return <Loading />;
+  if (isEdit && clientEditQuery?.error) return <ErrorScreen onRetry={clientEditQuery?.refetch} />;
 
   const handleSave = async () => {
     if (!name || !phone) {
