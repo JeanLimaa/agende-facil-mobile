@@ -12,8 +12,10 @@ import { ActionsModal } from "@/shared/components/ActionsModal";
 import { Client } from "@/shared/types/client.interface";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
+import { useConfirm } from "@/shared/hooks/useConfirm";
 
 export function ClientsScreen() {
+  const {confirm, ConfirmDialogComponent} = useConfirm();
   const { data: clients = [], isLoading, error, refetch } = useClients();
   const [searchQuery, setSearchQuery] = useState("");
   const [fabModalVisible, setFabModalVisible] = useState(false);
@@ -49,9 +51,37 @@ export function ClientsScreen() {
     router.push({ pathname: "/(tabs)/clients/edit", params: { id: selectedClient?.id } });
   };
 
-  const handleBlock = () => {
+  const handleBlock = async () => {
     setActionModalVisible(false);
-    Toast.show({ type: "info", text1: "Bloquear cliente", text2: "Funcionalidade não implementada." });
+
+    if (!selectedClient) {
+      Toast.show({ type: "error", text1: "Erro", text2: "Nenhum cliente selecionado." });
+      return;
+    }
+    const action = selectedClient.isBlocked ? "Desbloquear" : "Bloquear";
+    const confirmed = await confirm({
+      title: `${action} Cliente`,
+      message: `Você tem certeza que deseja ${action.toLowerCase()} o cliente ${selectedClient.name}?`,
+      confirmText: action,
+      cancelText: "Cancelar"
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await api.patch(`/clients/${selectedClient.id}/block`);
+
+      await refetch();
+      setSelectedClient(prev => prev ? { ...prev, isBlocked: !prev.isBlocked } : prev);
+
+      Toast.show({ 
+        type: "success", 
+        text1: selectedClient.isBlocked ? "Cliente desbloqueado com sucesso." : "Cliente bloqueado com sucesso.",
+        position: "bottom"
+      });
+    } catch (error) {
+      Toast.show({ type: "error", text1: "Erro ao bloquear cliente.", position: "bottom" });
+    }
   };
 
   const handleCall = () => {
@@ -82,7 +112,7 @@ export function ClientsScreen() {
     Linking.openURL(`https://wa.me/${phone}`);
   };
 
-  const handleDelete = async () => {
+/*   const handleDelete = async () => {
     setActionModalVisible(false);
 
     if (!selectedClient) return;
@@ -107,7 +137,7 @@ export function ClientsScreen() {
         }
       ]
     );
-  };
+  }; */
 
   const onClientCardPress = (client: Client) => {
     setSelectedClient(client);
@@ -158,10 +188,16 @@ export function ClientsScreen() {
         clientName={selectedClient?.name || "Ações"}
         onEdit={handleEdit}
         onBlock={handleBlock}
+        isBlocked={selectedClient?.isBlocked || false}
         onCall={handleCall}
         onWhatsApp={handleWhatsApp}
-        onDelete={() => { handleDelete(); }}
+        onHistory={() => {
+          setActionModalVisible(false);
+          //router.push({ pathname: "/(tabs)/clients/history", params: { id: selectedClient?.id } });
+        }}
       />
+
+      {ConfirmDialogComponent}
     </View>
   );
 }

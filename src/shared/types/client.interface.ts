@@ -5,4 +5,5 @@ export interface Client {
   phone: string;
   createdAt: string;
   updatedAt: string;
+  isBlocked: boolean;
 }
