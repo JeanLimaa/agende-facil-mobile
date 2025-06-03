@@ -4,6 +4,7 @@ import { View, StyleSheet } from "react-native";
 import { format } from "date-fns";
 import { ClientAppointments } from "@/shared/types/client.interface";
 import { Service } from "@/shared/types/service.interface";
+import { MaterialIcons } from "@expo/vector-icons";
 
 export function AppointmentHistoryClientCard({ appointment }: { appointment: ClientAppointments }) {
   return (
@@ -11,6 +12,11 @@ export function AppointmentHistoryClientCard({ appointment }: { appointment: Cli
       <Card.Content>
         <View style={styles.header}>
           <Text style={styles.date}>{format(appointment.date, "dd/MM/yyyy 'às' HH:mm")}</Text>
+          <MaterialIcons
+            name={getStatusIcon(appointment.status)}
+            size={24}
+            color={getStatusColor(appointment.status)}
+          />
         </View>
         <Text style={styles.status}>Status: {translateStatus(appointment.status)}</Text>
         <Text style={styles.employee}>Atendido por: {appointment.employee?.name || "Não informado"}</Text>
@@ -33,6 +39,10 @@ function getStatusIcon(status: string) {
     case "CONFIRMED":
       return "check-circle";
     case "FINISHED":
+      return "check";
+    case "PENDING":
+      return "hourglass-empty";
+    case "COMPLETED":
       return "done-all";
     default:
       return "help";
@@ -45,6 +55,10 @@ function getStatusColor(status: string) {
       return "#e74c3c";
     case "CONFIRMED":
       return "#3498db";
+    case "PENDING":
+      return "#f39c12";
+    case "COMPLETED":
+      return "#8e44ad";
     case "FINISHED":
       return "#2ecc71";
     default:

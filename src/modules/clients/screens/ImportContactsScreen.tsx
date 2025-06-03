@@ -8,6 +8,7 @@ import Toast from "react-native-toast-message";
 import { router } from "expo-router";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
 import { ContactItem } from "../components/ContactItem";
+import { EmptyText } from "@/shared/components/EmptyText";
 
 export function ImportContactsScreen() {
   const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
@@ -106,9 +107,9 @@ export function ImportContactsScreen() {
           ListEmptyComponent={
             !isLoading
               ? () => (
-                  <Text style={styles.emptyText}>
-                    Nenhum contato encontrado.
-                  </Text>
+                  <EmptyText>
+                    Nenhum contato encontrado. Verifique se você concedeu permissão para acessar os contatos.
+                  </EmptyText>
                 )
               : null
           }

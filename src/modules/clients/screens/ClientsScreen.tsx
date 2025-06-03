@@ -13,6 +13,7 @@ import { Client } from "@/shared/types/client.interface";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
 import { useConfirm } from "@/shared/hooks/useConfirm";
+import { EmptyText } from "@/shared/components/EmptyText";
 
 export function ClientsScreen() {
   const {confirm, ConfirmDialogComponent} = useConfirm();
@@ -177,7 +178,7 @@ export function ClientsScreen() {
             onPress={() => onClientCardPress(item)}
           />
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum cliente encontrado.</Text>}
+        ListEmptyComponent={<EmptyText>Nenhum cliente encontrado.</EmptyText>}
       />
 
       <FAB

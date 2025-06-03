@@ -24,12 +24,6 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "gray",
   },
-  emptyText: {
-    textAlign: "center",
-    marginTop: 20,
-    fontSize: 16,
-    color: "gray",
-  },
   fab: {
     position: "absolute",
     right: 20,

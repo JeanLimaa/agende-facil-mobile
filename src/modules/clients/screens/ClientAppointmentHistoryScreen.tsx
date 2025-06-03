@@ -6,6 +6,7 @@ import { AppointmentHistoryClientCard } from "../components/AppointmentHistoryCl
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
+import { EmptyText } from "@/shared/components/EmptyText";
 
 export function ClientAppointmentHistoryScreen({ clientId }: { clientId: number }) {
   const { data, isLoading, error, refetch } = useClientAppointments(clientId);
@@ -24,9 +25,9 @@ export function ClientAppointmentHistoryScreen({ clientId }: { clientId: number 
             renderItem={({ item }) => <AppointmentHistoryClientCard appointment={item} />}
             contentContainerStyle={{ paddingBottom: 16 }}
             ListEmptyComponent={
-            <View style={{ padding: 16 }}>
-                <Text>Nenhum agendamento encontrado.</Text>
-            </View>
+              <EmptyText>
+                Nenhum agendamento encontrado para este cliente.
+              </EmptyText>
             }
         />
         </View>
