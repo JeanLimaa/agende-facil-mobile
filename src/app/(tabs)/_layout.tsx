@@ -21,6 +21,7 @@ import ClientsPage from "./clients";
 import NewClientPage from './clients/new';
 import ImportContactsPage from './clients/import';
 import EditClientPage from './clients/edit';
+import AppointmentsHistoryPage from './clients/appointments-history';
 
 const ConfiguracoesPage = () => <View><Text>Configurações Screen</Text></View>;
 const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
@@ -39,6 +40,7 @@ function StackNavigator() {
       <Stack.Screen name="clients/new" component={NewClientPage} />
       <Stack.Screen name="clients/edit" component={EditClientPage} />
       <Stack.Screen name="clients/import" component={ImportContactsPage} />
+      <Stack.Screen name="clients/appointments-history" component={AppointmentsHistoryPage} />
     </Stack.Navigator>
   );
 }
