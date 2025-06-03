@@ -1,5 +1,5 @@
 import { Client } from "./client.interface";
-import { Employee } from "./employee.interface";
+import { Employee } from "../../modules/appointments/types/employee.interface";
 
 export interface IAppointment {
   id: string;

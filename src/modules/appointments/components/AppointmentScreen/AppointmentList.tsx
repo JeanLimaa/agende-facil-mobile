@@ -2,7 +2,7 @@ import React from "react";
 import { View, FlatList } from "react-native";
 import { Text, Card } from "react-native-paper";
 import { styles } from "../../styles/styles";
-import { AppointmentStatus } from "../../types/appointment.types";
+import { AppointmentStatus } from "@/shared/types/appointment.types";
 import { getStatusBorderColor } from "../../helpers/appointments.helper";
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";

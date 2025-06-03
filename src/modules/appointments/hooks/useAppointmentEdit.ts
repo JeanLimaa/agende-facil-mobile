@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/shared/services/apiService';
-import { AppointmentEditResponse } from '../types/appointment.types';
+import { AppointmentEditResponse } from '@/shared/types/appointment.types';
 
 export function useAppointmentEdit(appointmentEditId?: string) {
   return useQuery<AppointmentEditResponse>({

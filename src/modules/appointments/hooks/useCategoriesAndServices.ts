@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/shared/services/apiService';
 import { Category } from '../types/category.interface';
-import { Service } from '../types/service.interface';
+import { Service } from '@/shared/types/service.interface';
 
 interface Result {
   categories: Category[];

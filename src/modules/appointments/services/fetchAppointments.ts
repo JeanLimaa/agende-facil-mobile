@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { IAppointment, IAppointmentMapped } from "../types/appointment.types";
+import { IAppointment, IAppointmentMapped } from "@/shared/types/appointment.types";
 import api from "@/shared/services/apiService";
 import { format } from "date-fns";
 

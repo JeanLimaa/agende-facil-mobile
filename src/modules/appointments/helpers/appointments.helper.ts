@@ -1,4 +1,4 @@
-import { AppointmentStatus, IAppointmentMapped } from "../types/appointment.types";
+import { AppointmentStatus, IAppointmentMapped } from "@/shared/types/appointment.types";
 
 export const groupByDate = (appointments: IAppointmentMapped[]): { [key: string]: IAppointmentMapped[] } => {
   const grouped = appointments.reduce((acc, appointment) => {

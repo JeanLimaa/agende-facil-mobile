@@ -1,8 +1,8 @@
 import { useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/shared/services/apiService";
-import {  IAppointmentMapped } from "../types/appointment.types";
-import { AppointmentStatus } from "../types/appointment.types";
+import {  IAppointmentMapped } from "@/shared/types/appointment.types";
+import { AppointmentStatus } from "@/shared/types/appointment.types";
 import { router } from "expo-router";
 import { groupByDate } from "../helpers/appointments.helper";
 import { fetchAppointments } from "../services/fetchAppointments";
