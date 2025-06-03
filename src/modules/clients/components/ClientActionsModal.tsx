@@ -32,13 +32,13 @@ export function ClientActionsModal({
           label: "Editar", 
           action: onEdit, 
           icon: { name: "edit", family: "MaterialIcons" }, 
-          color: "#1976D2"
+          color: "#1E88E5"
         },
         { 
           label: "Ligar", 
           action: onCall, 
           icon: { name: "phone", family: "MaterialIcons" }, 
-          color: "#43A047" 
+          color: "#388E3C" 
         },
         { 
           label: "WhatsApp", 
@@ -50,13 +50,13 @@ export function ClientActionsModal({
           label: isBlocked ? "Desbloquear" : "Bloquear", 
           action: onBlock, 
           icon: { name: isBlocked ? "lock-open" : "block", family: "MaterialIcons" },
-          color: isBlocked ? "#43A047" : "#E53935"
+          color: isBlocked ? "#388E3C" : "#E53935"
         },
         {
           label: "Histórico de Agendamentos",
           action: onHistory,
           icon: { name: "history", family: "MaterialIcons" },
-          color: "#757575"
+          color: "#546E7A"
         }
       ]}
     />
