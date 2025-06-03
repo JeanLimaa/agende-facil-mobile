@@ -61,7 +61,7 @@ export function ClientsScreen() {
     const action = selectedClient.isBlocked ? "Desbloquear" : "Bloquear";
     const confirmed = await confirm({
       title: `${action} Cliente`,
-      message: `Você tem certeza que deseja ${action.toLowerCase()} o cliente ${selectedClient.name}?`,
+      message: `Você tem certeza que deseja ${action.toLowerCase()} os agendamentos para o cliente ${selectedClient.name}?`,
       confirmText: action,
       cancelText: "Cancelar"
     });
@@ -145,6 +145,20 @@ export function ClientsScreen() {
     setActionModalVisible(true);
   }
 
+  const handleHistory = () => {
+    setActionModalVisible(false);
+    
+    if (!selectedClient) {
+      Toast.show({ type: "error", text1: "Erro", text2: "Nenhum cliente selecionado." });
+      return;
+    }
+
+    router.push({
+      pathname: "/(tabs)/clients/appointments-history",
+      params: { id: selectedClient.id }
+    });
+  }
+
   return (
     <View style={styles.container}>
       <Searchbar
@@ -191,10 +205,7 @@ export function ClientsScreen() {
         isBlocked={selectedClient?.isBlocked || false}
         onCall={handleCall}
         onWhatsApp={handleWhatsApp}
-        onHistory={() => {
-          setActionModalVisible(false);
-          //router.push({ pathname: "/(tabs)/clients/history", params: { id: selectedClient?.id } });
-        }}
+        onHistory={handleHistory}
       />
 
       {ConfirmDialogComponent}

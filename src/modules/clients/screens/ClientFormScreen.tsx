@@ -23,9 +23,9 @@ export function ClientFormScreen({
   const [phone, setPhone] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const hasLoaded = useRef(false);
-  const isEdit = Boolean(clientId);
   const clientEditQuery = useClientById(Number(clientId));
-  
+
+  const isEdit = Boolean(clientId);
 
   if (isEdit && clientEditQuery?.isLoading) return <Loading />;
   if (isEdit && clientEditQuery?.error) return <ErrorScreen onRetry={clientEditQuery?.refetch} />;
@@ -45,6 +45,7 @@ export function ClientFormScreen({
         type: "error",
         text1: "Erro",
         text2: "Nome e telefone são obrigatórios.",
+        position: "bottom",
       });
       return;
     }
