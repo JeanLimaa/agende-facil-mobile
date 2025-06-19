@@ -3,9 +3,18 @@ import * as SplashScreen from 'expo-splash-screen';
 import 'react-native-reanimated';
 import React from 'react';
 import { AuthProvider } from '@/modules/auth/contexts/AuthContext';
-import { PaperProvider } from 'react-native-paper';
+import { PaperProvider, DefaultTheme } from 'react-native-paper';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
+
+const theme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#fff',
+    text: '#000',
+  },
+};
 
 const queryClient = new QueryClient();
 
@@ -20,7 +29,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <PaperProvider>
+        <PaperProvider theme={theme}>
         <Stack screenOptions={{ headerShown: false }}>
             <Stack.Screen name="(tabs)" />
             <Stack.Screen name="auth" />
