@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { AxiosError } from "axios";
 import { Alert } from "react-native"; 
-import { showAlertForStatusCode } from "@/shared/helpers/showAlertForStatusCode";
+import { showAlertForStatusCode } from "@/shared/helpers/showAlertForStatusCode.helper.";
 
 export function useApiErrorHandler() {
   const handleApiError = useCallback((error: unknown, defaultMessage = "Erro inesperado") => {
