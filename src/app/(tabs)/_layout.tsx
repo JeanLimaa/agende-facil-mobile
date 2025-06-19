@@ -22,8 +22,16 @@ import NewClientPage from './clients/new';
 import ImportContactsPage from './clients/import';
 import EditClientPage from './clients/edit';
 import AppointmentsHistoryPage from './clients/appointments-history';
+import WorkingHoursScreen from "./settings/booking-and-website/working-hours";
+import CompanyProfileScreen from "./settings/booking-and-website/company-profile";
+import AddressScreen from "./settings/booking-and-website/address";
+import ProfessionalsScreen from "./settings/records/professionals";
+import CategoriesScreen from "./settings/records/categories";
+import ServicesScreen from "./settings/records/services";
+import ChangePasswordScreen from "./settings/security/change-password";
+import DeactivateAccountScreen from "./settings/security/deactivate-account";
+import SettingsPage from './settings';
 
-const ConfiguracoesPage = () => <View><Text>Configurações Screen</Text></View>;
 const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
 
 const Drawer = createDrawerNavigator();
@@ -41,6 +49,16 @@ function StackNavigator() {
       <Stack.Screen name="clients/edit" component={EditClientPage} />
       <Stack.Screen name="clients/import" component={ImportContactsPage} />
       <Stack.Screen name="clients/appointments-history" component={AppointmentsHistoryPage} />
+
+      <Stack.Screen name="settings" component={SettingsPage} />
+      <Stack.Screen name="settings/booking-and-website/working-hours" component={WorkingHoursScreen} />
+      <Stack.Screen name="settings/booking-and-website/company-profile" component={CompanyProfileScreen} />
+      <Stack.Screen name="settings/booking-and-website/address" component={AddressScreen} />
+      <Stack.Screen name="settings/records/professionals" component={ProfessionalsScreen} />
+      <Stack.Screen name="settings/records/categories" component={CategoriesScreen} />
+      <Stack.Screen name="settings/records/services" component={ServicesScreen} />
+      <Stack.Screen name="settings/security/change-password" component={ChangePasswordScreen} />
+      <Stack.Screen name="settings/security/deactivate-account" component={DeactivateAccountScreen} />
     </Stack.Navigator>
   );
 }
@@ -114,9 +132,9 @@ function DrawerNavigator() {
       drawerContent={(props) => <CustomDrawerContent {...props} />}
       screenOptions={{
         drawerStyle: { width: "80%" },
-        header: ({ navigation }) => (
+        header: ({ navigation, options, route }) => (
           <Header navigation={navigation}>
-            <Appbar.Content title="Agende Fácil" />
+             <Appbar.Content title={options.title ?? route.name} />
           </Header>
         ),
         drawerActiveTintColor: Colors.light.mainColor,
@@ -144,10 +162,10 @@ function DrawerNavigator() {
         }}
       />
       <Drawer.Screen
-        name="Configuracoes"
-        component={ConfiguracoesPage}
+        name="Settings"
+        component={SettingsPage}
         options={{
-          title: "Configurações",
+          title: "Settings",
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cog-outline" color={color} size={size} />
           ),
