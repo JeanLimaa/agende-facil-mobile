@@ -11,13 +11,14 @@ import { LoadingModal } from "@/shared/components/LoadingModal";
 import { styles } from "../styles/styles";
 import { useAppointmentScreenLogic } from "../hooks/useAppointmentScreenLogic";
 import { router } from "expo-router";
+import ErrorScreen from "@/app/ErrorScreen";
 
 export function AppointmentScreen() {
   const logic = useAppointmentScreenLogic();
   const [fabModalVisible, setFabModalVisible] = useState(false);
 
+  if (logic.error) return <ErrorScreen onRetry={logic.refetch} message="Erro ao carregar agendamentos" />;
   if (logic.isLoading) return <LoadingModal visible={logic.isLoading} />;
-  if (logic.error) return <Text>Erro ao carregar os agendamentos.</Text>;
 
   function handleFabOption(option: "new" | "block") {
     setFabModalVisible(false);

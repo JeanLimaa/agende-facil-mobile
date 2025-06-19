@@ -6,7 +6,7 @@ import { AppointmentStatus } from "@/shared/types/appointment.types";
 import { router } from "expo-router";
 import { groupByDate } from "../helpers/appointments.helper";
 import { fetchAppointments } from "../services/fetchAppointments";
-import { showAlertForStatusCode } from "@/shared/helpers/showAlertForStatusCode";
+import { showAlertForStatusCode } from "@/shared/helpers/showAlertForStatusCode.helper.";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import Toast from "react-native-toast-message";
 
@@ -19,12 +19,12 @@ export function useAppointmentScreenLogic() {
   const [isActionModalVisible, setIsActionModalVisible] = useState(false);
   const apiErrorHandler = useApiErrorHandler();
 
-  const { data, isLoading, error } = useQuery<IAppointmentMapped[]>({
+  const { data, isLoading, error, refetch } = useQuery<IAppointmentMapped[]>({
     queryKey: ["appointments"],
     queryFn: fetchAppointments,
     refetchInterval: 1 * 60 * 1000,
   });
-
+  
   const appointments = data || [];
   const queryClient = useQueryClient();
 
@@ -169,6 +169,7 @@ export function useAppointmentScreenLogic() {
     handleCancel,
     handleConfirmCancel,
     toggleAttended,
-    actionOptions
+    actionOptions,
+    refetch
   };
 }
