@@ -1,2 +1,2 @@
-import CategoriesScreen from "@/modules/settings/pages/CategoriesScreen";
+import CategoriesScreen from "@/modules/settings/screens/CategoriesScreen";
 export default CategoriesScreen;

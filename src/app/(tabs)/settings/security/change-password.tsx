@@ -1,2 +1,2 @@
-import ChangePasswordScreen from "@/modules/settings/pages/ChangePasswordScreen";
+import ChangePasswordScreen from "@/modules/settings/screens/ChangePasswordScreen";
 export default ChangePasswordScreen;

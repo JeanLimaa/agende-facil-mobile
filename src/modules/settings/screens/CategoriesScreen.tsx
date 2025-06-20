@@ -2,12 +2,12 @@ import React from "react";
 import { View, Text } from "react-native";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
 
-export default function AddressScreen() {
+export default function CategoriesScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <AppBarHeader message="Address" />
+      <AppBarHeader message="Categorias" />
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Configure your company address</Text>
+        <Text>Manage categories</Text>
       </View>
     </View>
   );

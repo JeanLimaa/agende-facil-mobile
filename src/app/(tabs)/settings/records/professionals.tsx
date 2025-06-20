@@ -1,2 +1,2 @@
-import ProfessionalsScreen from "@/modules/settings/pages/ProfessionalsScreen";
+import ProfessionalsScreen from "@/modules/settings/screens/ProfessionalsScreen";
 export default ProfessionalsScreen;

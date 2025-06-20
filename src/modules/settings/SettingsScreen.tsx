@@ -7,60 +7,63 @@ export function SettingsScreen() {
   return (
     <ScrollView style={styles.container}>
       <SettingsSection
-        title="Client Booking & Website"
+        title="Agendamentos e Site"
         items={[
           {
-            label: "Service and Working Hours",
+            label: "Serviços e Horário de Funcionamento",
             icon: "clock-outline",
             onPress: () => router.push("/(tabs)/settings/booking-and-website/working-hours"),
           },
           {
-            label: "Company Profile",
+            label: "Perfil da Empresa",
             icon: "account-circle-outline",
             onPress: () => router.push("/(tabs)/settings/booking-and-website/company-profile"),
           },
           {
-            label: "Address",
+            label: "Endereço",
             icon: "map-marker-outline",
             onPress: () => router.push("/(tabs)/settings/booking-and-website/address"),
           },
         ]}
       />
+
       <SettingsSection
-        title="Records"
+        title="Cadastros"
         items={[
           {
-            label: "Professionals",
+            label: "Profissionais",
             icon: "account-multiple-outline",
             onPress: () => router.push("/(tabs)/settings/records/professionals"),
           },
           {
-            label: "Categories",
+            label: "Categorias",
             icon: "shape-outline",
             onPress: () => router.push("/(tabs)/settings/records/categories"),
           },
           {
-            label: "Services",
+            label: "Serviços",
             icon: "hammer-wrench",
             onPress: () => router.push("/(tabs)/settings/records/services"),
           },
         ]}
       />
+
       <SettingsSection
-        title="Security"
+        title="Segurança"
         items={[
           {
-            label: "Change Password",
+            label: "Alterar Senha",
             icon: "lock-reset",
             onPress: () => router.push("/(tabs)/settings/security/change-password"),
           },
           {
-            label: "Deactivate Account",
+            label: "Desativar Conta",
             icon: "account-off-outline",
             onPress: () => router.push("/(tabs)/settings/security/deactivate-account"),
           },
         ]}
       />
+
     </ScrollView>
   );
 }

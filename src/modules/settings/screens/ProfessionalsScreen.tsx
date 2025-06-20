@@ -2,12 +2,12 @@ import React from "react";
 import { View, Text } from "react-native";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
 
-export default function DeactivateAccountScreen() {
+export default function ProfessionalsScreen() {
   return (
     <View style={{ flex: 1 }}>
-      <AppBarHeader message="Deactivate Account" />
+      <AppBarHeader message="Profissionais" />
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-        <Text>Deactivate your account</Text>
+        <Text>Manage professionals</Text>
       </View>
     </View>
   );
