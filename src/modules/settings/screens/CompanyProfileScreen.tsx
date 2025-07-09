@@ -1,10 +1,28 @@
+import { useCompany } from "@/shared/hooks/queries/useCompany";
 import { GenericForm } from "../components/GenericForm";
 import { SettingsTabsLayout } from "../SettingsTabsLayout";
 import { useRef } from "react";
+import ErrorScreen from "@/app/ErrorScreen";
+import { Loading } from "@/shared/components/Loading";
 
 export default function CompanyProfileScreen() {
   const companyFormRef = useRef(null);
   const addressFormRef = useRef(null);
+
+  const {
+    data: companyInfo,
+    isLoading: isLoadingCompanyInfo,
+    error: companyError,
+    refetch
+  } = useCompany();
+
+  if (isLoadingCompanyInfo) {
+    return <Loading />;
+  }
+
+  if (companyError) {
+    return <ErrorScreen message="Ocorreu algum erro ao tentar obter os dados atuais" onRetry={refetch} />;
+  }
 
   return (
     <SettingsTabsLayout
@@ -17,27 +35,31 @@ export default function CompanyProfileScreen() {
           endpoint: "settings/companies/profile",
           method: "PUT",
           content: <GenericForm ref={companyFormRef} fields={[
-            { name: "name", label: "Nome da Empresa", type: "text", placeholder: "Digite o nome da empresa" },
-            { name: "email", label: "E-mail", type: "email", placeholder: "Digite o e-mail" },
-            { name: "phone", label: "Telefone", type: "tel", placeholder: "Digite o telefone" },
-            { name: "description", label: "Descrição da empresa", type: "text", placeholder: "Digite a descrição" },
+            { name: "name", label: "Nome da Empresa", type: "text" },
+            { name: "email", label: "E-mail", type: "email" },
+            { name: "phone", label: "Telefone", type: "tel" },
+            { name: "description", label: "Descrição da empresa", type: "text" },
             { name: "logo", label: "Logo da Empresa", type: "file" },
-          ]} />,
+          ]} initialValues={{
+            ...companyInfo?.profile
+          }} />,
         },
         {
           key: "address",
           title: "Endereço",
           ref: addressFormRef,
-          endpoint: "/companies/address",
+          endpoint: "settings/companies/address",
           method: "PUT",
           content: <GenericForm ref={addressFormRef} fields={[
-            { name: "zipCode", label: "CEP", type: "text", placeholder: "Digite o CEP" },
-            { name: "street", label: "Rua", type: "text", placeholder: "Digite a rua" },
-            { name: "number", label: "Número", type: "text", placeholder: "Digite o número" },
-            { name: "neighborhood", label: "Bairro", type: "text", placeholder: "Digite o bairro" },
-            { name: "city", label: "Cidade", type: "text", placeholder: "Digite a cidade" },
-            { name: "state", label: "Estado", type: "text", placeholder: "Digite o estado" },
-          ]} />,
+            { name: "country", label: "País", type: "text"},
+            { name: "city", label: "Cidade", type: "text" },
+            { name: "state", label: "Estado", type: "text" },
+            { name: "zipCode", label: "CEP", type: "text" },
+            { name: "street", label: "Rua", type: "text" },
+            { name: "number", label: "Número", type: "text"},
+            { name: "neighborhood", label: "Bairro", type: "text" },
+          ]} initialValues={{...companyInfo?.address}}
+          />,
         }
       ]}
     />
