@@ -7,6 +7,7 @@ import { Colors } from "@/shared/constants/Colors";
 import Toast from "react-native-toast-message";
 import api from "@/shared/services/apiService";
 import { AxiosError } from "axios";
+import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 
 type TabItem = {
   key: string;
@@ -24,7 +25,7 @@ type SettingsTabsLayoutProps = {
 
 export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProps) {
   const [activeTab, setActiveTab] = useState(tabs[0].key);
-  const activeContent = tabs.find(tab => tab.key === activeTab)?.content;
+  const handleError = useApiErrorHandler();
 
   const handleSave = async () => {
     try {
@@ -56,20 +57,14 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
           Toast.show({
             type: "success",
             text1: "Sucesso",
-            text2: `Dados salvos com sucesso.`,
+            text2: `Dados de ${tab.title} salvo com sucesso.`,
             position: "bottom",
             visibilityTime: 3000,
           });
         }
       }
     } catch (err: AxiosError | any) {
-      Toast.show({
-        type: "error",
-        text1: "Erro",
-        text2: err?.response?.data?.message || "Ocorreu um erro ao salvar os dados.",
-        position: "bottom",
-        visibilityTime: 3000,
-      });
+      handleError(err);
     }
   };
 
@@ -92,8 +87,13 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
       </View>
 
       <ScrollView style={styles.content}>
-        {activeContent}
+        {tabs.map(tab => (
+          <View key={tab.key} style={{ display: activeTab === tab.key ? 'flex' : 'none' }}>
+            {tab.content}
+          </View>
+        ))}
       </ScrollView>
+
 
       <FAB
         style={styles.fab}

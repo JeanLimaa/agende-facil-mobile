@@ -10,7 +10,7 @@ export function SettingsScreen() {
         title="Agendamentos e Site"
         items={[
           {
-            label: "Serviços e Horário de Funcionamento",
+            label: "Horário de atendimento",
             icon: "clock-outline",
             onPress: () => router.push("/(tabs)/settings/booking-and-website/working-hours"),
           },
@@ -18,11 +18,6 @@ export function SettingsScreen() {
             label: "Perfil da Empresa",
             icon: "account-circle-outline",
             onPress: () => router.push("/(tabs)/settings/booking-and-website/company-profile"),
-          },
-          {
-            label: "Endereço",
-            icon: "map-marker-outline",
-            onPress: () => router.push("/(tabs)/settings/booking-and-website/address"),
           },
         ]}
       />
