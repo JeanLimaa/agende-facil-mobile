@@ -165,7 +165,7 @@ function DrawerNavigator() {
         name="Settings"
         component={SettingsPage}
         options={{
-          title: "Settings",
+          title: "Configurações",
           drawerIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="cog-outline" color={color} size={size} />
           ),
