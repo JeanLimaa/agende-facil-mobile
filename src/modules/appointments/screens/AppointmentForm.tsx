@@ -11,8 +11,8 @@ import { DatePicker, DateTimeSelector, TimePicker } from "../components/Appointm
 import { ServiceSelector } from "../components/AppointmentForm/ServiceSelector";
 import { SummaryShow } from "../components/AppointmentForm/SummaryShow";
 
-import { useEmployees } from "../hooks/useEmployees";
-import { useCategoriesAndServices } from "../hooks/useCategoriesAndServices";
+import { useEmployees } from "../../../shared/hooks/queries/useEmployees";
+import { useCategoriesAndServices } from "../../../shared/hooks/queries/useCategoriesAndServices";
 import { useAppointmentEdit } from "../hooks/useAppointmentEdit";
 
 import api from "@/shared/services/apiService";

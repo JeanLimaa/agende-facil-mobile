@@ -7,7 +7,7 @@ import { appointmentFormStyle as styles } from "../styles/styles";
 import { EmployeeSelector } from "../components/AppointmentForm/EmployeeSelector";
 import { DatePicker, DateTimeSelector, TimePicker } from "../components/AppointmentForm/DateTimeSelector";
 import api from "@/shared/services/apiService";
-import { useEmployees } from "../hooks/useEmployees";
+import { useEmployees } from "../../../shared/hooks/queries/useEmployees";
 import { Loading } from "@/shared/components/Loading";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import Toast from "react-native-toast-message";
