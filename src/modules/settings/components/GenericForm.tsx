@@ -1,4 +1,4 @@
-import React, { forwardRef, useImperativeHandle, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from "react";
 import { 
   View, 
   Text, 
@@ -21,11 +21,20 @@ interface Field {
 
 interface GenericFormProps {
   fields: Field[];
+  // valores iniciais do formulário, ex: { name: "John Doe", email: "johndoe@example.com" }
+  initialValues?: Record<string, any>; 
 }
 
-export const GenericForm = forwardRef(({ fields }: GenericFormProps, ref) => {
+export const GenericForm = forwardRef(({ fields, initialValues }: GenericFormProps, ref) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [menuVisible, setMenuVisible] = useState<string | null>(null); // para abrir só um select de cada vez
+
+  useEffect(() => {
+    if (initialValues) {
+      setFormData(initialValues);
+    }
+  }, [initialValues]);
+
 
   useImperativeHandle(ref, () => ({
     getData: () => formData
