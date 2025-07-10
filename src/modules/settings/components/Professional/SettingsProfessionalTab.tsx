@@ -14,21 +14,31 @@ export function SettingsProfessionalTabs() {
 
     return (
         <SettingsTabsLayout
-            headerTitle="Profissionais"
+            headerTitle={employeeData?.name || "Novo profissional"}
             tabs={[
                 {
                     key: "professional-profile",
                     title: "Perfil",
-                    endpoint: "employee",
+                    endpoint: employeeId ? `employee/${employeeId}` : "employee",
                     method: employeeId ? "PUT" : "POST",
                     ref: professionalProfileRef,
                     content:
                         <GenericForm
                             fields={[
                                 { name: "name", label: "Nome", type: "text" },
-                                { name: "email", label: "E-mail", type: "email" },
                                 { name: "phone", label: "Telefone", type: "tel" },
-                                { name: "position", label: "Cargo", type: "text" }
+                                { name: "position", label: "Cargo", type: "text" },
+                                { 
+                                    name: "profileImageUrl", 
+                                    label: "Imagem profissional", 
+                                    type: "file"
+                                },
+                                { 
+                                    name: "displayOnline", 
+                                    label: "Exibir profissional no agendamento online", 
+                                    type: "checkbox",
+                                    placeholder: "Habilitar para que o profissional apareça nas opções de agendamento online."
+                                }
                             ]}
                             ref={professionalProfileRef}
                             initialValues={employeeData}
