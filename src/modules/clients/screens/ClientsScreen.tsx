@@ -1,31 +1,36 @@
 import React, { useState } from "react";
-import { View, FlatList, Text, Linking, Alert } from "react-native";
+import { View, FlatList } from "react-native";
 import { FAB, Searchbar } from "react-native-paper";
 import { styles } from "../styles/styles";
 import { useClients } from "@/shared/hooks/queries/useClients";
 import { router } from "expo-router";
-import api from "@/shared/services/apiService";
-import Toast from "react-native-toast-message";
 import { ClientCard } from "../components/ClientCard";
 import { ClientActionsModal } from "../components/ClientActionsModal";
 import { ActionsModal } from "@/shared/components/ActionsModal";
-import { Client } from "@/shared/types/client.interface";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
-import { useConfirm } from "@/shared/hooks/useConfirm";
 import { EmptyText } from "@/shared/components/EmptyText";
+import { useClientActions } from "../hooks/useClientActions";
 
 export function ClientsScreen() {
-  const {confirm, ConfirmDialogComponent} = useConfirm();
   const { data: clients = [], isLoading, error, refetch } = useClients();
+  const {
+    ConfirmDialogComponent,
+    setActionModalVisible,
+    actionModalVisible,
+    selectedClient,
+    handleBlock,
+    handleCall,
+    handleWhatsApp,
+    handleEdit,
+    handleHistory,
+    openActions
+  } = useClientActions(refetch);
   const [searchQuery, setSearchQuery] = useState("");
   const [fabModalVisible, setFabModalVisible] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [actionModalVisible, setActionModalVisible] = useState(false);
 
   if(isLoading) return <Loading />;
   if (error) return <ErrorScreen onRetry={refetch} />
-
 
   const filteredClients = clients.filter(client =>
     client.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -46,120 +51,6 @@ export function ClientsScreen() {
     }
   };
 
-  // Ações do modal
-  const handleEdit = () => {
-    setActionModalVisible(false);
-    router.push({ pathname: "/(tabs)/clients/edit", params: { id: selectedClient?.id } });
-  };
-
-  const handleBlock = async () => {
-    setActionModalVisible(false);
-
-    if (!selectedClient) {
-      Toast.show({ type: "error", text1: "Erro", text2: "Nenhum cliente selecionado." });
-      return;
-    }
-    const action = selectedClient.isBlocked ? "Desbloquear" : "Bloquear";
-    const confirmed = await confirm({
-      title: `${action} Cliente`,
-      message: `Você tem certeza que deseja ${action.toLowerCase()} os agendamentos para o cliente ${selectedClient.name}?`,
-      confirmText: action,
-      cancelText: "Cancelar"
-    });
-
-    if (!confirmed) return;
-
-    try {
-      await api.patch(`/clients/${selectedClient.id}/block`);
-
-      await refetch();
-      setSelectedClient(prev => prev ? { ...prev, isBlocked: !prev.isBlocked } : prev);
-
-      Toast.show({ 
-        type: "success", 
-        text1: selectedClient.isBlocked ? "Cliente desbloqueado com sucesso." : "Cliente bloqueado com sucesso.",
-        position: "bottom"
-      });
-    } catch (error) {
-      Toast.show({ type: "error", text1: "Erro ao bloquear cliente.", position: "bottom" });
-    }
-  };
-
-  const handleCall = () => {
-    setActionModalVisible(false);
-
-    if (!selectedClient) {
-      Toast.show({ type: "error", text1: "Erro", text2: "Nenhum cliente selecionado." });
-      return;
-    }
-
-    Linking.openURL(`tel:${selectedClient.phone}`);
-  };
-
-  const handleWhatsApp = () => {
-    setActionModalVisible(false);
-
-    if (!selectedClient) {
-      Toast.show({ type: "error", text1: "Erro", text2: "Nenhum cliente selecionado." });
-      return;
-    }
-
-    
-    if (!selectedClient.phone) {
-      Toast.show({ type: "error", text1: "Erro", text2: "Telefone do cliente não disponível." });
-      return;
-    }
-    const phone = selectedClient.phone.replace(/\D/g, "");
-    Linking.openURL(`https://wa.me/${phone}`);
-  };
-
-/*   const handleDelete = async () => {
-    setActionModalVisible(false);
-
-    if (!selectedClient) return;
-
-    Alert.alert(
-      "Deletar cliente",
-      "Tem certeza que deseja deletar este cliente?",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Deletar",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              await api.delete(`/clients/${selectedClient.id}`);
-              Toast.show({ type: "success", text1: "Cliente deletado" });
-              refetch();
-            } catch {
-              Toast.show({ type: "error", text1: "Erro ao deletar cliente" });
-            }
-          }
-        }
-      ]
-    );
-  }; */
-
-  const onClientCardPress = (client: Client) => {
-    setSelectedClient(client);
-    //if (!selectedClient) return;
-    setActionModalVisible(true);
-  }
-
-  const handleHistory = () => {
-    setActionModalVisible(false);
-    
-    if (!selectedClient) {
-      Toast.show({ type: "error", text1: "Erro", text2: "Nenhum cliente selecionado." });
-      return;
-    }
-
-    router.push({
-      pathname: "/(tabs)/clients/appointments-history",
-      params: { id: selectedClient.id }
-    });
-  }
-
   return (
     <View style={styles.container}>
       <Searchbar
@@ -175,7 +66,7 @@ export function ClientsScreen() {
         renderItem={({ item }) => (
           <ClientCard
             client={item}
-            onPress={() => onClientCardPress(item)}
+            onPress={() => openActions(item)}
           />
         )}
         ListEmptyComponent={<EmptyText>Nenhum cliente encontrado.</EmptyText>}
