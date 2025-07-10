@@ -9,6 +9,8 @@ import api from "@/shared/services/apiService";
 import { AxiosError } from "axios";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import { useQueryClient } from "@tanstack/react-query";
+import { fabStyle } from "@/shared/styles/fab";
+import { removeEmptyFields } from "@/shared/helpers/removeEmptyFields";
 
 type TabItem = {
   key: string;
@@ -33,7 +35,7 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
   const handleSave = async () => {
     try {
       for (const tab of tabs) {
-        const data = tab.ref?.current?.getData?.();
+        const data = removeEmptyFields(tab.ref?.current?.getData?.());
         const noData = !data || Object.keys(data).length <= 0;
         
         if(tab.key === tabs[0].key && noData) {
@@ -107,7 +109,7 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
 
 
       <FAB
-        style={styles.fab}
+        style={fabStyle.fab}
         icon={() => <Ionicons name="save" size={24} color="white" />}
         label="Salvar"
         onPress={handleSave}
@@ -123,12 +125,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f2f2f2",
     borderBottomWidth: 1,
     borderBottomColor: "#ddd",
-  },
-  fab: {
-    position: "absolute",
-    bottom: 16,
-    right: 16,
-    backgroundColor: Colors.light.mainColor,
   },
   tabItem: {
     paddingVertical: 12,

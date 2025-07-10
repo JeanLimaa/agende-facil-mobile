@@ -9,6 +9,7 @@ import { FAB } from "react-native-paper";
 import { ProfessionalCard } from "../components/Professional/ProfessionalCard";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
+import { fabStyle } from "@/shared/styles/fab";
 
 export default function ProfessionalsScreen() {
   const navigation = useNavigation<any>();
@@ -24,7 +25,14 @@ export default function ProfessionalsScreen() {
     setActionsModalVisible(true);
   }
 
+  const cleanActions = () => {
+    setSelectedEmployee(null);
+    setActionsModalVisible(false);
+  }
+
   function handleAddEmployee() {
+    cleanActions();
+    
     navigation.navigate("settings/records/professionals/professional-form", { employeeId: null });
   }
 
@@ -38,7 +46,9 @@ export default function ProfessionalsScreen() {
       return;
     }
     
-    navigation.navigate("settings/records/professionals/professional-form", { employeeId })
+    cleanActions();
+
+    navigation.navigate("settings/records/professionals/professional-form", { employeeId });
   }
 
   function handleDeleteEmployee(employeeId: number | null) {
@@ -51,7 +61,7 @@ export default function ProfessionalsScreen() {
       return;
     }
 
-    console.log("Excluir profissional com ID:", employeeId);
+    cleanActions();
   }
 
   return (
@@ -77,7 +87,7 @@ export default function ProfessionalsScreen() {
 
       <FAB
         icon="plus"
-        style={{ position: 'absolute', bottom: 16, right: 16 }}
+        style={fabStyle.fab}
         onPress={handleAddEmployee}
       />
 
