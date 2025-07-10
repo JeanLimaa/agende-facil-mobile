@@ -12,6 +12,7 @@ import { useAppointmentScreenLogic } from "../hooks/useAppointmentScreenLogic";
 import { router } from "expo-router";
 import ErrorScreen from "@/app/ErrorScreen";
 import { Loading } from "@/shared/components/Loading";
+import { fabStyle } from "@/shared/styles/fab";
 
 export function AppointmentScreen() {
   const logic = useAppointmentScreenLogic();
@@ -49,7 +50,7 @@ export function AppointmentScreen() {
         selectedDate={logic.selectedDate}
       />
       <FAB
-        style={styles.fab}
+        style={fabStyle.fab}
         icon="plus"
         onPress={() => setFabModalVisible(true)}
       />

@@ -11,6 +11,7 @@ import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
 import { EmptyText } from "@/shared/components/EmptyText";
 import { useClientActions } from "../hooks/useClientActions";
+import { fabStyle } from "@/shared/styles/fab";
 
 export function ClientsScreen() {
   const { data: clients = [], isLoading, error, refetch } = useClients();
@@ -73,7 +74,7 @@ export function ClientsScreen() {
       />
 
       <FAB
-        style={styles.fab}
+        style={fabStyle.fab}
         icon="plus"
         onPress={() => setFabModalVisible(true)}
       />

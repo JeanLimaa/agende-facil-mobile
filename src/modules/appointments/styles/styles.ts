@@ -46,12 +46,6 @@ export const styles = StyleSheet.create({
       fontSize: 16,
       color: "gray",
     },
-    fab: {
-      position: "absolute",
-      right: 20,
-      bottom: 20,
-      backgroundColor: Colors.light.mainColor,
-    },
     cardContainer: {
         margin: 10,
         gap: 5,

@@ -24,12 +24,6 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: "gray",
   },
-  fab: {
-    position: "absolute",
-    right: 20,
-    bottom: 20,
-    backgroundColor: Colors.light.mainColor,
-  },
   formContainer: {
     flex: 1,
     padding: 10,
