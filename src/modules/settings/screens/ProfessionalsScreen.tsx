@@ -10,12 +10,17 @@ import { ProfessionalCard } from "../components/Professional/ProfessionalCard";
 import Toast from "react-native-toast-message";
 import { useNavigation } from "@react-navigation/native";
 import { fabStyle } from "@/shared/styles/fab";
+import { useConfirm } from "@/shared/hooks/useConfirm";
+import api from "@/shared/services/apiService";
+import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 
 export default function ProfessionalsScreen() {
   const navigation = useNavigation<any>();
   const {data: employees, refetch, isLoading, error} = useEmployees();
   const [actionsModalVisible, setActionsModalVisible] = React.useState(false);
   const [selectedEmployee, setSelectedEmployee] = React.useState<number | null>(null);
+  const { confirm: confirmDelete, ConfirmDialogComponent: ConfirmDeleteDialogComponent } = useConfirm();
+  const handleApiError = useApiErrorHandler();
 
   if(isLoading) return <Loading />;
   if(error) return <ErrorScreen message="Erro ao carregar profissionais" onRetry={refetch} />;
@@ -51,7 +56,7 @@ export default function ProfessionalsScreen() {
     navigation.navigate("settings/records/professionals/professional-form", { employeeId });
   }
 
-  function handleDeleteEmployee(employeeId: number | null) {
+  async function handleDeleteEmployee(employeeId: number | null) {
     if(!employeeId) {
       Toast.show({
         type: 'error',
@@ -62,6 +67,27 @@ export default function ProfessionalsScreen() {
     }
 
     cleanActions();
+
+    const confirmed = await confirmDelete({
+      title: "Excluir Profissional",
+      message: "Você tem certeza que deseja excluir este profissional? Esta ação não pode ser desfeita.",
+      confirmText: "Excluir",
+      cancelText: "Cancelar",
+    });
+
+    if (!confirmed) return;
+
+    try {
+      await api.delete(`/employee/${employeeId}`);
+      Toast.show({
+        type: 'success',
+        text1: 'Sucesso',
+        text2: 'Profissional excluído com sucesso.'
+      });
+      refetch();
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 
   return (
@@ -110,6 +136,8 @@ export default function ProfessionalsScreen() {
           }
         ]}
       />
+
+      {ConfirmDeleteDialogComponent}
     </View>
   );
 }
