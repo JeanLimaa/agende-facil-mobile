@@ -2,8 +2,7 @@ import React, { forwardRef, useEffect, useImperativeHandle, useState } from "rea
 import { 
   View, 
   Text, 
-  StyleSheet, 
-  //TextInput 
+  StyleSheet,
 } from "react-native";
 import { Checkbox, Menu, TextInput, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -13,7 +12,7 @@ import { Colors } from "@/shared/constants/Colors";
 interface Field {
   name: string;
   label: string;
-  type: "text" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area";
+  type: "text" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area" | "header";
   placeholder?: string;
   options?: { label: string; value: string }[];
 }
@@ -104,11 +103,15 @@ export const GenericForm = forwardRef(({ fields, initialValues }: GenericFormPro
         if (field.type === "checkbox") {
           return (
             <View key={field.name} style={styles.checkboxContainer}>
-              <Checkbox
-                status={formData[field.name] ? "checked" : "unchecked"}
-                onPress={() => handleChange(field.name, !formData[field.name])}
-              />
-              <Text style={styles.checkboxLabel}>{field.label}</Text>
+              <View style={styles.checkBoxContainerRow}>
+                <Checkbox
+                  status={formData[field.name] ? "checked" : "unchecked"}
+                  onPress={() => handleChange(field.name, !formData[field.name])}
+                />
+                <Text style={styles.checkboxLabel}>{field.label}</Text>
+              </View>
+
+              <Text style={styles.checkboxPlaceholder}>{field.placeholder}</Text>
             </View>
           );
         }
@@ -147,6 +150,14 @@ export const GenericForm = forwardRef(({ fields, initialValues }: GenericFormPro
           );
         }
 
+        if (field.type === "header") {
+          return (
+            <Text key={field.name} style={{ fontSize: 18, fontWeight: "bold" }}>
+              {field.label}
+            </Text>
+          );
+        }
+
         return (
           <View key={field.name}>
             <TextInput
@@ -171,17 +182,29 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#fff",
-    borderColor: "#ccc",
+    backgroundColor: Colors.light.background,
+    borderColor: Colors.light.border,
     borderWidth: 1,
     padding: 0.5,
     borderRadius: 8,
   },
   checkboxContainer: {
+    backgroundColor: Colors.light.background,
+    padding: 10,
+    borderRadius: 8,
+    borderColor: Colors.light.border,
+    gap: 5
+  },
+  checkBoxContainerRow: {
     flexDirection: "row",
     alignItems: "center",
   },
   checkboxLabel: {
     fontSize: 16,
+  },
+  checkboxPlaceholder: {
+    fontSize: 12,
+    color: Colors.light.textSecondary,
+    marginLeft: 10,
   },
 });

@@ -13,10 +13,12 @@ export const Colors = {
     textTertiary: '#444',
     mainColor: '#F97316',
     background: '#EAEAEA',
+    backgroundSecondary: '#F9FAFB',
     tint: tintColorLight,
     icon: '#687076',
     tabIconDefault: '#687076',
     tabIconSelected: tintColorLight,
+    border: '#ccc',
   },
   dark: {
     text: '#ECEDEE',
