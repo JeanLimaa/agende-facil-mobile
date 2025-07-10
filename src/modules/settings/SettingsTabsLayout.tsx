@@ -1,5 +1,5 @@
 import React, { ReactNode, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Button, Alert } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
 import { Ionicons } from "@expo/vector-icons";
 import { FAB } from "react-native-paper";
@@ -8,6 +8,7 @@ import Toast from "react-native-toast-message";
 import api from "@/shared/services/apiService";
 import { AxiosError } from "axios";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
+import { useQueryClient } from "@tanstack/react-query";
 
 type TabItem = {
   key: string;
@@ -16,6 +17,7 @@ type TabItem = {
   ref: React.RefObject<any>;
   endpoint: string;
   method: "POST" | "PUT";
+  tanstackCacheKeys?: string[];
 };
 
 type SettingsTabsLayoutProps = {
@@ -26,6 +28,7 @@ type SettingsTabsLayoutProps = {
 export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProps) {
   const [activeTab, setActiveTab] = useState(tabs[0].key);
   const handleError = useApiErrorHandler();
+  const queryClient = useQueryClient()
 
   const handleSave = async () => {
     try {
@@ -62,6 +65,12 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
             visibilityTime: 3000,
           });
         }
+
+        if (tab.tanstackCacheKeys && tab.tanstackCacheKeys?.length > 0) {
+          for(const key of tab.tanstackCacheKeys) {
+            queryClient.invalidateQueries({ queryKey: [key], refetchType: "all" });
+          }
+        }
       }
     } catch (err: AxiosError | any) {
       handleError(err);
@@ -72,19 +81,21 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
     <View style={styles.container}>
       <AppBarHeader message={headerTitle} />
 
-      <View style={styles.tabBar}>
-        {tabs.map(tab => (
-          <TouchableOpacity
-            key={tab.key}
-            style={[styles.tabItem, activeTab === tab.key && styles.activeTab]}
-            onPress={() => setActiveTab(tab.key)}
-          >
-            <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
-              {tab.title}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      {tabs.length > 1 && (
+        <View style={styles.tabBar}>
+          {tabs.map(tab => (
+            <TouchableOpacity
+              key={tab.key}
+              style={[styles.tabItem, activeTab === tab.key && styles.activeTab]}
+              onPress={() => setActiveTab(tab.key)}
+            >
+              <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
+                {tab.title}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
 
       <ScrollView style={styles.content}>
         {tabs.map(tab => (
