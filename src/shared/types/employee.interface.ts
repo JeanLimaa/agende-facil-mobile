@@ -1,7 +1,6 @@
 export interface Employee {
   id: number;
   name: string;
-  position: string;
   phone: string;
   startHour: string;
   endHour: string;
@@ -9,4 +8,6 @@ export interface Employee {
   companyId: number;
   createdAt: string;
   updatedAt: string;
+  position?: string;
+  profileImageUrl?: string;
 }

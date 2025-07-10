@@ -1,4 +1,4 @@
-import { Employee } from "@/modules/appointments/types/employee.interface";
+import { Employee } from "@/shared/types/employee.interface";
 import { IAppointment } from "./appointment.types";
 import { Service } from "./service.interface";
 
