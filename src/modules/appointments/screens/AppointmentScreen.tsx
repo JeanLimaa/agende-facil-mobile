@@ -7,18 +7,18 @@ import { ShowAllSwitch } from "../components/AppointmentScreen/ShowAllSwitch";
 import { AppointmentList } from "../components/AppointmentScreen/AppointmentList";
 import { ActionsModal } from "@/shared/components/ActionsModal";
 import { CancelDialog } from "../components/AppointmentScreen/CancelDialog";
-import { LoadingModal } from "@/shared/components/LoadingModal";
 import { styles } from "../styles/styles";
 import { useAppointmentScreenLogic } from "../hooks/useAppointmentScreenLogic";
 import { router } from "expo-router";
 import ErrorScreen from "@/app/ErrorScreen";
+import { Loading } from "@/shared/components/Loading";
 
 export function AppointmentScreen() {
   const logic = useAppointmentScreenLogic();
   const [fabModalVisible, setFabModalVisible] = useState(false);
 
   if (logic.error) return <ErrorScreen onRetry={logic.refetch} message="Erro ao carregar agendamentos" />;
-  if (logic.isLoading) return <LoadingModal visible={logic.isLoading} />;
+  if (logic.isLoading) return <Loading />
 
   function handleFabOption(option: "new" | "block") {
     setFabModalVisible(false);
