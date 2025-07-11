@@ -11,6 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Colors } from "@/shared/constants/Colors";
 import { GenericalCard } from "@/shared/components/GenericalCard";
 import { Ionicons } from "@expo/vector-icons";
+import { useSettingsTabs } from "../contexts/SettingTabsContext";
 
 interface Field {
   name: string;
@@ -19,11 +20,13 @@ interface Field {
   placeholder?: string;
   options?: { label: string; value: string }[];
   onChange?: (value: any, allValues: Record<string, any>) => void;
+  required?: boolean;
 }
 
 interface GenericFormProps {
   fields: Field[];
-  // valores iniciais do formulário, ex: { name: "John Doe", email: "johndoe@example.com" }
+  tabKey: string
+  
   initialValues?: Record<string, any>; 
   onChange?: (data: Record<string, any>) => void;
 }
@@ -32,9 +35,11 @@ export type GenericFormRef = {
   getData: () => Record<string, any>;
 };
 
-export const GenericForm = forwardRef(({ fields, initialValues, onChange }: GenericFormProps, ref) => {
+export const GenericForm = ({ fields, initialValues, onChange, tabKey }: GenericFormProps) => {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [menuVisible, setMenuVisible] = useState<string | null>(null); // para abrir só um select de cada vez
+
+  const { setTabData } = useSettingsTabs();
 
   useEffect(() => {
     if (initialValues) {
@@ -42,9 +47,11 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
     }
   }, [initialValues]);
 
-  useImperativeHandle(ref, () => ({
-    getData: () => formData
-  }));
+  useEffect(() => {
+    if (setTabData) {
+      setTabData(tabKey, formData);
+    }
+  }, [formData, tabKey]);
 
   const handleChange = (name: string, value: any) => {
     setFormData(prev => {
@@ -79,18 +86,21 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
   return (
     <View style={{ gap: 20 }}>
       {fields.map(field => {
+        const fieldLabel = field.required ? `${field.label} *` : field.label;
+
         if (field.type === "date") {
           const [showDatePicker, setShowDatePicker] = useState(false);
           const currentValue = formData[field.name] || new Date();
 
           return (
             <View key={field.name}>
-              <Text style={styles.label}>{field.label}</Text>
+              <Text style={styles.label}>{fieldLabel}</Text>
               <Button onPress={() => setShowDatePicker(true)} mode="outlined">
                 {formData[field.name]
                   ? new Date(formData[field.name]).toLocaleDateString()
                   : "Selecionar data"}
               </Button>
+
               {showDatePicker && (
                 <DateTimePicker
                   value={new Date(currentValue)}
@@ -108,7 +118,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
         if (field.type === "file") {
           return (
             <View key={field.name}>
-              <Text style={styles.label}>{field.label}</Text>
+              <Text style={styles.label}>{fieldLabel}</Text>
               <Button mode="contained" onPress={() => handleFilePick(field.name)}>
                 Selecionar Imagem
               </Button>
@@ -125,7 +135,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
                   status={formData[field.name] ? "checked" : "unchecked"}
                   onPress={() => handleChange(field.name, !formData[field.name])}
                 />
-                <Text style={styles.checkboxLabel}>{field.label}</Text>
+                <Text style={styles.checkboxLabel}>{fieldLabel}</Text>
               </View>
 
               <Text style={styles.placeholderLabel}>{field.placeholder}</Text>
@@ -136,7 +146,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
         if (field.type === "select" && field.options) {
           return (
             <View key={field.name}>
-              <Text>{field.label}</Text>
+              <Text>{fieldLabel}</Text>
               <Menu
                 visible={menuVisible === field.name}
                 onDismiss={() => setMenuVisible(null)}
@@ -170,7 +180,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
         if (field.type === "header") {
           return (
             <Text key={field.name} style={styles.header}>
-              {field.label}
+              {fieldLabel}
             </Text>
           );
         }
@@ -286,7 +296,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
 
           return (
             <View key={field.name} style={{ gap: 8 }}>
-              <Text style={styles.label}>{field.label}</Text>
+              <Text style={styles.label}>{fieldLabel}</Text>
 
               <View
                 style={{
@@ -365,7 +375,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
         return (
           <View key={field.name}>
             <TextInput
-              label={field.label}
+              label={fieldLabel}
               style={styles.input}
               outlineColor={Colors.light.mainColor}
               activeOutlineColor={Colors.light.mainColor}
@@ -385,7 +395,7 @@ export const GenericForm = forwardRef(({ fields, initialValues, onChange }: Gene
       })}
     </View>
   );
-});
+}
 
 const styles = StyleSheet.create({
   label: {

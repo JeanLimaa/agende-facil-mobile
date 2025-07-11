@@ -11,110 +11,122 @@ import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { fabStyle } from "@/shared/styles/fab";
 import { removeEmptyFields } from "@/shared/helpers/removeEmptyFields";
+import { SettingsTabsProvider, useSettingsTabs } from "./contexts/SettingTabsContext";
+import { router } from "expo-router";
 
 type TabItem = {
   key: string;
   title: string;
   content: ReactNode;
-  ref: React.RefObject<any>;
-  endpoint: string;
-  method: "POST" | "PUT";
   tanstackCacheKeys?: string[];
 };
 
 type SettingsTabsLayoutProps = {
   tabs: TabItem[];
   headerTitle: string;
+  endpoint: string;
+  method: "POST" | "PUT";
 };
 
-export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProps) {
+function SettingsTabsLayout({ tabs, headerTitle, endpoint, method }: SettingsTabsLayoutProps) {
   const [activeTab, setActiveTab] = useState(tabs[0].key);
   const handleError = useApiErrorHandler();
   const queryClient = useQueryClient()
-
+  const { tabsData } = useSettingsTabs();
+  
   const handleSave = async () => {
     try {
-      for (const tab of tabs) {
-        const data = removeEmptyFields(tab.ref?.current?.getData?.());
-        const noData = !data || Object.keys(data).length <= 0;
-        
-        if(tab.key === tabs[0].key && noData) {
-          Toast.show({
-            type: "info",
-            text1: "Atenção",
-            text2: "Preencha os campos obrigatórios antes de salvar.",
-            position: "bottom",
-            visibilityTime: 3000,
-          });
-          return;
-        }
-
-        if(noData) continue;
-
-        if (data) {
-          if (tab.method === "POST") {
-            await api.post(tab.endpoint, data);
-          }
-          if (tab.method === "PUT") {
-            await api.put(tab.endpoint, data);
-          }
-          
-          Toast.show({
-            type: "success",
-            text1: "Sucesso",
-            text2: `Dados de ${tab.title} salvo com sucesso.`,
-            position: "bottom",
-            visibilityTime: 3000,
-          });
-        }
-
-        if (tab.tanstackCacheKeys && tab.tanstackCacheKeys?.length > 0) {
-          for(const key of tab.tanstackCacheKeys) {
-            queryClient.invalidateQueries({ queryKey: [key], refetchType: "all" });
-          }
-        }
+      // Validar dados obrigatórios (exemplo para o primeiro tab)
+      const firstTabData = tabsData[tabs[0].key];
+      if (!firstTabData || Object.keys(removeEmptyFields(firstTabData)).length === 0) {
+        Toast.show({
+          type: "info",
+          text1: "Atenção",
+          text2: "Preencha os campos obrigatórios antes de salvar.",
+          position: "bottom",
+          visibilityTime: 3000,
+        });
+        return;
       }
+
+      // Junta todos os dados não vazios
+      const allData = Object.values(tabsData)
+        .map(removeEmptyFields)
+        .reduce((acc, data) => ({ ...acc, ...data }), {});
+
+      if (Object.keys(allData).length === 0) return;
+      
+      if (method === "POST") {
+        await api.post(endpoint, allData);
+      } else if (method === "PUT") {
+        await api.put(endpoint, allData);
+      }
+
+      Toast.show({
+        type: "success",
+        text1: "Sucesso",
+        text2: "Dados salvos com sucesso.",
+        position: "bottom",
+        visibilityTime: 3000,
+      });
+
+      // Invalida caches se necessário
+      tabs.forEach((tab) => {
+        tab.tanstackCacheKeys?.forEach((key) => {
+          queryClient.invalidateQueries({ queryKey: [key], refetchType: "all" });
+        });
+      });
+
+      router.back();
     } catch (err: AxiosError | any) {
       handleError(err);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <AppBarHeader message={headerTitle} />
+      <View style={styles.container}>
+        <AppBarHeader message={headerTitle} />
 
-      {tabs.length > 1 && (
-        <View style={styles.tabBar}>
-          {tabs.map(tab => (
-            <TouchableOpacity
-              key={tab.key}
-              style={[styles.tabItem, activeTab === tab.key && styles.activeTab]}
-              onPress={() => setActiveTab(tab.key)}
-            >
-              <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
-                {tab.title}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-
-      <ScrollView style={styles.content}>
-        {tabs.map(tab => (
-          <View key={tab.key} style={{ display: activeTab === tab.key ? 'flex' : 'none' }}>
-            {tab.content}
+        {tabs.length > 1 && (
+          <View style={styles.tabBar}>
+            {tabs.map(tab => (
+              <TouchableOpacity
+                key={tab.key}
+                style={[styles.tabItem, activeTab === tab.key && styles.activeTab]}
+                onPress={() => setActiveTab(tab.key)}
+              >
+                <Text style={[styles.tabText, activeTab === tab.key && styles.activeTabText]}>
+                  {tab.title}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
-        ))}
-      </ScrollView>
+        )}
+
+        <ScrollView style={styles.content}>
+          {tabs.map(tab => (
+            <View key={tab.key} style={{ display: activeTab === tab.key ? 'flex' : 'none' }}>
+              {tab.content}
+            </View>
+          ))}
+        </ScrollView>
 
 
-      <FAB
-        style={fabStyle.fab}
-        icon={() => <Ionicons name="save" size={24} color="white" />}
-        label="Salvar"
-        onPress={handleSave}
-      />
-    </View>
+        <FAB
+          style={fabStyle.fab}
+          icon={() => <Ionicons name="save" size={24} color="white" />}
+          label="Salvar"
+          onPress={handleSave}
+        />
+      </View>
+  );
+}
+
+export function SettingsTabs(props: SettingsTabsLayoutProps) {
+  return (
+    <SettingsTabsProvider>
+      <SettingsTabsLayout {...props} />
+    </SettingsTabsProvider>
   );
 }
 
