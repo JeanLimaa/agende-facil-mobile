@@ -60,7 +60,7 @@ export function GenericalCard({
 
 const styles = StyleSheet.create({
   card: {
-    marginHorizontal: 12,
+    marginHorizontal: 6,
     marginVertical: 6,
     borderRadius: 10,
     elevation: 2,

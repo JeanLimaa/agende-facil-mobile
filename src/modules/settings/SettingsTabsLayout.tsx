@@ -49,7 +49,7 @@ export function SettingsTabsLayout({ tabs, headerTitle }: SettingsTabsLayoutProp
           return;
         }
 
-        if(noData) return;
+        if(noData) continue;
 
         if (data) {
           if (tab.method === "POST") {
