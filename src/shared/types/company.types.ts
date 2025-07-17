@@ -15,7 +15,13 @@ interface CompanyAddress {
     state: string;
 }
 
-interface CompanyInfo {
+interface CompanyWorkingHours {
+    serviceInterval: number; // em minutos
+    workingHours: { startTime: string; endTime: string; dayOfWeek: number }[]; // dayOfWeek é o dia da semana (0-6, onde 0 é domingo)
+}
+
+export interface CompanyInfo {
     profile: CompanyProfile;
     address: CompanyAddress;
+    schedule: CompanyWorkingHours;
 }
