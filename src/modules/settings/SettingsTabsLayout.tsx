@@ -48,18 +48,11 @@ function SettingsTabsLayout({ tabs, headerTitle, endpoint, method }: SettingsTab
         });
         return;
       }
-
-      // Junta todos os dados não vazios
-      const allData = Object.values(tabsData)
-        .map(removeEmptyFields)
-        .reduce((acc, data) => ({ ...acc, ...data }), {});
-
-      if (Object.keys(allData).length === 0) return;
       
       if (method === "POST") {
-        await api.post(endpoint, allData);
+        await api.post(endpoint, tabsData);
       } else if (method === "PUT") {
-        await api.put(endpoint, allData);
+        await api.put(endpoint, tabsData);
       }
 
       Toast.show({
