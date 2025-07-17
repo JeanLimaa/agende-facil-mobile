@@ -1,12 +1,10 @@
 import { useEmployee } from "@/shared/hooks/queries/useEmployees";
-import { SettingsTabsLayout } from "../../SettingsTabsLayout";
-import { GenericForm, GenericFormRef } from "../GenericForm";
+import { SettingsTabs } from "../../SettingsTabsLayout";
+import { GenericForm } from "../GenericForm";
 import { useRoute } from "@react-navigation/native";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 export function SettingsProfessionalTabs() {
-    const professionalProfileRef = useRef(null);
-    const hoursRef = useRef<GenericFormRef>(null);
     const [serviceIntervalPlaceholder, setServiceIntervalPlaceholder] = useState("");
 
     const route = useRoute();
@@ -36,19 +34,19 @@ export function SettingsProfessionalTabs() {
     }
 
     return (
-        <SettingsTabsLayout
+        <SettingsTabs
             headerTitle={employeeData?.name || "Novo profissional"}
+            endpoint={employeeId ? `settings/employee/${employeeId}` : "settings/employee"}
+            method={employeeId ? "PUT" : "POST"}
             tabs={[
                 {
                     key: "professional-profile",
                     title: "Perfil",
-                    endpoint: employeeId ? `employee/${employeeId}` : "employee",
-                    method: employeeId ? "PUT" : "POST",
-                    ref: professionalProfileRef,
                     content:
                         <GenericForm
+                            tabKey="professional-profile"
                             fields={[
-                                { name: "name", label: "Nome", type: "text" },
+                                { name: "name", label: "Nome", type: "text", required: true},
                                 { name: "phone", label: "Telefone", type: "tel" },
                                 { name: "position", label: "Cargo", type: "text" },
                                 { 
@@ -63,19 +61,15 @@ export function SettingsProfessionalTabs() {
                                     placeholder: "Habilitar para que o profissional apareça nas opções de agendamento online."
                                 }
                             ]}
-                            ref={professionalProfileRef}
                             initialValues={employeeData}
                         />
                 },
                 {
                     key: "professional-hours",
                     title: "Horários",
-                    ref: hoursRef,
-                    endpoint: employeeId ? `employee/${employeeId}/working-hours` : "employee/working-hours",
-                    method: employeeId ? "PUT" : "POST",
                     content: 
                     <GenericForm
-                        ref={hoursRef}
+                        tabKey="professional-hours"
                         fields={[
                             { 
                                 name: "serviceInterval", 

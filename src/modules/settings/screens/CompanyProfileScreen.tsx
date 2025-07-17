@@ -1,15 +1,11 @@
 import { companyInfoQueryKey, useCompany } from "@/shared/hooks/queries/useCompany";
 import { GenericForm } from "../components/GenericForm";
-import { SettingsTabsLayout } from "../SettingsTabsLayout";
-import { useRef } from "react";
+import { SettingsTabs } from "../SettingsTabsLayout";
 import ErrorScreen from "@/app/ErrorScreen";
 import { Loading } from "@/shared/components/Loading";
 import { myQueryKey } from "@/shared/hooks/queries/useMe";
 
 export default function CompanyProfileScreen() {
-  const companyFormRef = useRef(null);
-  const addressFormRef = useRef(null);
-
   const {
     data: companyInfo,
     isLoading: isLoadingCompanyInfo,
@@ -20,23 +16,22 @@ export default function CompanyProfileScreen() {
   if (isLoadingCompanyInfo) {
     return <Loading />;
   }
-
+  
   if (companyError) {
     return <ErrorScreen message="Ocorreu algum erro ao tentar obter os dados atuais" onRetry={refetch} />;
   }
 
   return (
-    <SettingsTabsLayout
+    <SettingsTabs
       headerTitle="Perfil da Empresa"
+      endpoint="settings/company/profile"
+      method="PUT"
       tabs={[
         {
-          key: "company",
+          key: "profile",
           title: "Perfil",
-          ref: companyFormRef,
-          endpoint: "settings/companies/profile",
-          method: "PUT",
           tanstackCacheKeys: [companyInfoQueryKey, myQueryKey],
-          content: <GenericForm ref={companyFormRef} fields={[
+          content: <GenericForm tabKey="profile" fields={[
             { name: "name", label: "Nome da Empresa", type: "text" },
             { name: "email", label: "E-mail", type: "email" },
             { name: "phone", label: "Telefone", type: "tel" },
@@ -49,11 +44,8 @@ export default function CompanyProfileScreen() {
         {
           key: "address",
           title: "Endereço",
-          ref: addressFormRef,
-          endpoint: "settings/companies/address",
-          method: "PUT",
           tanstackCacheKeys: [companyInfoQueryKey],
-          content: <GenericForm ref={addressFormRef} fields={[
+          content: <GenericForm tabKey="address" fields={[
             { name: "country", label: "País", type: "text"},
             { name: "city", label: "Cidade", type: "text" },
             { name: "state", label: "Estado", type: "text" },
