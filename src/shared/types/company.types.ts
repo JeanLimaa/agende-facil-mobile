@@ -1,4 +1,4 @@
-interface CompanyProfile {
+export interface CompanyProfile {
     name: string;
     email: string;
     phone: string;
@@ -6,7 +6,7 @@ interface CompanyProfile {
     logo?: string; // URL ou caminho do arquivo
 }
 
-interface CompanyAddress {
+export interface CompanyAddress {
     zipCode: string;
     street: string;
     number: string;
@@ -15,9 +15,15 @@ interface CompanyAddress {
     state: string;
 }
 
-interface CompanyWorkingHours {
+// Representa o horário de funcionamento para um único dia da semana
+export interface DailyWorkingHour {
+  startTime: string;   // formato "HH:mm"
+  endTime: string;     // formato "HH:mm"
+  dayOfWeek: number;   // 0 = domingo, 6 = sábado
+}
+export interface CompanyWorkingHours {
     serviceInterval: number; // em minutos
-    workingHours: { startTime: string; endTime: string; dayOfWeek: number }[]; // dayOfWeek é o dia da semana (0-6, onde 0 é domingo)
+    workingHours: DailyWorkingHour[]; 
 }
 
 export interface CompanyInfo {
