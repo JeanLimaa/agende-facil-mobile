@@ -55,10 +55,21 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
   }, [formData, tabKey]);
 
   const handleChange = (name: string, value: FieldValue) => {
-    setFormData(prev => {
-      const updated = { ...prev, [name]: value };
+    const fieldObj = fields.find(field => field.name === name);
+    let parsedValue: FieldValue = value;
 
-      const fieldObj = fields.find(field => field.name === name);
+    if (fieldObj?.type === "number" && typeof value === "string") {
+      const onlyNumbers = value.replace(/[^0-9]/g, '');
+      parsedValue =  Number(onlyNumbers);
+
+      if (isNaN(parsedValue)) {
+        parsedValue = 0;
+      }
+    }
+
+    setFormData(prev => {
+      const updated = { ...prev, [name]: parsedValue };
+
       if (fieldObj && typeof fieldObj.onChange === "function") {
         fieldObj.onChange(value, updated);
       }
