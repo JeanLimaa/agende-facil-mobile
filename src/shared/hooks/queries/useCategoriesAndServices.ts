@@ -38,7 +38,7 @@ export function useCategoriesAndServices(enabled: boolean, showSpecialCategories
 
 export function useCategoryById(id: number | null) {
   return useQuery<Category>({
-    queryKey: categoryByIdQueryKey(id || 0),
+    queryKey: categoryByIdQueryKey(id),
     enabled: !!id,
     queryFn: async () => {
       const response = await api.get(`/category/${id}`);

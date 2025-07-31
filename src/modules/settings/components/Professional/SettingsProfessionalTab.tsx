@@ -1,4 +1,4 @@
-import { useEmployee } from "@/shared/hooks/queries/useEmployees";
+import { employeeByIdQueryKey, employeesQueryKey, useEmployee } from "@/shared/hooks/queries/useEmployees";
 import { SettingsTabs } from "../../SettingsTabsLayout";
 import { GenericForm } from "../GenericForm";
 import { useRoute } from "@react-navigation/native";
@@ -42,6 +42,7 @@ export function SettingsProfessionalTabs() {
                 {
                     key: "professional-profile",
                     title: "Perfil",
+                    tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
                     content:
                         <GenericForm
                             tabKey="professional-profile"
@@ -67,6 +68,7 @@ export function SettingsProfessionalTabs() {
                 {
                     key: "professional-hours",
                     title: "Horários",
+                    tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
                     content: 
                     <GenericForm
                         tabKey="professional-hours"

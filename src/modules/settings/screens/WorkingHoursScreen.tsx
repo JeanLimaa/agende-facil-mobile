@@ -1,7 +1,7 @@
 import React from "react";
 import { SettingsTabs } from "../SettingsTabsLayout";
 import { GenericForm } from "../components/GenericForm";
-import { useCompany } from "@/shared/hooks/queries/useCompany";
+import { companyInfoQueryKey, useCompany } from "@/shared/hooks/queries/useCompany";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
 
@@ -22,6 +22,7 @@ export default function WorkingHoursScreen() {
         {
           key: "working-hours",
           title: "Horários de Funcionamento",
+          tanstackCacheKeys: [companyInfoQueryKey],
           content: 
             <GenericForm
               tabKey="working-hours"
