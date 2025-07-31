@@ -14,7 +14,7 @@ export function useClients() {
     });
 }
 
-export function useClientById(id?: number){
+export function useClientById(id: number){
     return useQuery<Client>({
         queryKey: ["client", id],
         queryFn: async () => {
