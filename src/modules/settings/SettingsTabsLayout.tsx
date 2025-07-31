@@ -18,7 +18,7 @@ type TabItem = {
   key: string;
   title: string;
   content: ReactNode;
-  tanstackCacheKeys?: string[];
+  tanstackCacheKeys?: (string | [string, number])[];
 };
 
 type SettingsTabsLayoutProps = {
@@ -66,7 +66,8 @@ function SettingsTabsLayout({ tabs, headerTitle, endpoint, method }: SettingsTab
       // Invalida caches se necessário
       tabs.forEach((tab) => {
         tab.tanstackCacheKeys?.forEach((key) => {
-          queryClient.invalidateQueries({ queryKey: [key], refetchType: "all" });
+          const queryKey = Array.isArray(key) ? key : [key];
+          queryClient.invalidateQueries({ queryKey, refetchType: "all" });
         });
       });
 
