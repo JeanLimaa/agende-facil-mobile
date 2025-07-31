@@ -31,6 +31,8 @@ import ChangePasswordScreen from "./settings/security/change-password";
 import DeactivateAccountScreen from "./settings/security/deactivate-account";
 import SettingsPage from './settings';
 import { SettingsProfessionalTabs } from '@/modules/settings/components/Professional/SettingsProfessionalTab';
+import { AddOrEditCategory } from '@/modules/settings/components/Categories/AddOrEditCategory';
+import DeleteCategories from '@/modules/settings/components/Categories/DeleteCategories';
 
 const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
 
@@ -53,10 +55,16 @@ function StackNavigator() {
       <Stack.Screen name="settings" component={SettingsPage} />
       <Stack.Screen name="settings/booking-and-website/working-hours" component={WorkingHoursScreen} />
       <Stack.Screen name="settings/booking-and-website/company-profile" component={CompanyProfileScreen} />
+
       <Stack.Screen name="settings/records/professionals" component={ProfessionalsScreen} />
       <Stack.Screen name="settings/records/professionals/professional-form" component={SettingsProfessionalTabs} />
+      
       <Stack.Screen name="settings/records/categories" component={CategoriesScreen} />
+      <Stack.Screen name="settings/records/categories/category-form" component={AddOrEditCategory} />
+      <Stack.Screen name="settings/records/categories/delete-category" component={DeleteCategories} />
+
       <Stack.Screen name="settings/records/services" component={ServicesScreen} />
+      
       <Stack.Screen name="settings/security/change-password" component={ChangePasswordScreen} />
       <Stack.Screen name="settings/security/deactivate-account" component={DeactivateAccountScreen} />
     </Stack.Navigator>
