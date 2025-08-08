@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Alert } from 'react-native';
+import { View, Text, Alert, StyleSheet } from 'react-native';
 import { useCategoriesAndServices, useCategoryById } from '@/shared/hooks/queries/useCategoriesAndServices';
 import api from '@/shared/services/apiService';
 import { useRoute } from '@react-navigation/native';
@@ -28,6 +28,7 @@ export function DeleteCategories() {
 
     const route = useRoute();
     const { categoryId } = route.params as { categoryId: number | null };
+
     const {
         data: categorySelected,
         error: categoryError,
@@ -36,8 +37,12 @@ export function DeleteCategories() {
     } = useCategoryById(categoryId);
 
     const [moveAppointmentsToCategoryId, setMoveAppointmentsToCategoryId] = useState<number | null>(null);
-
     const [modalVisible, setModalVisible] = useState(false);
+
+    const hasOnlyOneCategory = allCategories.length === 1;
+
+    // Filtrando categorias para não exibir a atual
+    const filteredCategories = allCategories.filter(cat => cat.id !== categoryId);
 
     if (categoriesLoading || categoryLoading) return <Loading />;
 
@@ -86,36 +91,80 @@ export function DeleteCategories() {
     };
 
     return (
-        <View>
+        <>
             <AppBarHeader message="Excluir Categoria" />
-            
-            <Text>
-                Selecione a nova categoria para substituir a categoria <Text style={{ fontWeight: 'bold' }}>{categorySelected.name}</Text>:
-            </Text>
 
-            <Button
-                onPress={() => setModalVisible(true)}
-                mode="outlined"
-            >
-                {moveAppointmentsToCategoryId ? allCategories.find(cat => cat.id === moveAppointmentsToCategoryId)?.name : "Selecione a categoria"}
-            </Button>
+            <View style={styles.container}>
+                <Text style={styles.label}>
+                    Selecione a nova categoria para substituir a categoria <Text style={styles.bold}>{categorySelected.name}</Text>:
+                </Text>
 
-            <SelectableListModal
-                data={allCategories}
-                isLoading={categoriesLoading}
-                modalVisible={modalVisible}
-                setModalVisible={setModalVisible}
-                handleSelect={(category: Category) => setMoveAppointmentsToCategoryId(category.id)}
-                emptyMessage='Nenhuma categoria disponível'
-            />
+                {hasOnlyOneCategory && (
+                    <Text style={styles.warning}>
+                        ⚠️ Não é possível excluir esta categoria porque você só possui uma. Crie outra categoria para poder mover os serviços.
+                    </Text>
+                )}
 
-            <Button mode='contained' onPress={handleMoveServices}>
-                Deletar
-            </Button>
+                <Button
+                    onPress={() => setModalVisible(true)}
+                    mode="outlined"
+                    style={styles.selectButton}
+                    disabled={hasOnlyOneCategory}
+                >
+                    {moveAppointmentsToCategoryId
+                        ? allCategories.find(cat => cat.id === moveAppointmentsToCategoryId)?.name
+                        : "Selecione a categoria"}
+                </Button>
 
-            {ConfirmDeleteDialogComponent}
-        </View>
+                <Button
+                    mode='contained'
+                    onPress={handleMoveServices}
+                    disabled={hasOnlyOneCategory || !moveAppointmentsToCategoryId}
+                    style={styles.deleteButton}
+                >
+                    Deletar Categoria
+                </Button>
+
+
+                <SelectableListModal
+                    data={filteredCategories}
+                    isLoading={categoriesLoading}
+                    modalVisible={modalVisible}
+                    setModalVisible={setModalVisible}
+                    handleSelect={(category: Category) => setMoveAppointmentsToCategoryId(category.id)}
+                    emptyMessage='Nenhuma categoria disponível'
+                />
+
+                {ConfirmDeleteDialogComponent}
+            </View>
+        </>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        padding: 16,
+        backgroundColor: '#fff',
+    },
+    label: {
+        fontSize: 16,
+        marginBottom: 12,
+    },
+    bold: {
+        fontWeight: 'bold',
+    },
+    warning: {
+        color: '#b00020',
+        fontSize: 14,
+        marginVertical: 18,
+    },
+    selectButton: {
+        marginBottom: 16,
+    },
+    deleteButton: {
+        marginTop: 8,
+    }
+});
 
 export default DeleteCategories;
