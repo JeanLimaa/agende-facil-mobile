@@ -11,6 +11,7 @@ import { useEmployees } from "../../../shared/hooks/queries/useEmployees";
 import { Loading } from "@/shared/components/Loading";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import Toast from "react-native-toast-message";
+import { AppBarHeader } from "@/shared/components/AppBarHeader";
 
 export function BlockForm() {
   const queryClient = useQueryClient();
@@ -78,11 +79,8 @@ export function BlockForm() {
 
   return (
     <View style={styles.container}>
-      <Appbar.Header style={styles.header}>
-        <Appbar.BackAction onPress={() => router.back()} />
-        <Appbar.Content title="Bloquear Agenda" />
-      </Appbar.Header>
-      
+      <AppBarHeader message="Bloquear Agenda" />
+
       <ScrollView contentContainerStyle={styles.content}>
         <EmployeeSelector
           employees={employeesData || []}
