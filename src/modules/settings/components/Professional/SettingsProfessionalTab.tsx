@@ -73,6 +73,11 @@ export function SettingsProfessionalTabs() {
                     <GenericForm
                         tabKey="professional-hours"
                         fields={[
+                            {
+                                name: "informativeMessage",
+                                type: "informativeMessage",
+                                label: "Caso não seja definido nada aqui, será utilizado o horario padrão da empresa para este profissional.",
+                            },
                             { 
                                 name: "serviceInterval", 
                                 label: "Intervalo entre atendimentos (em minutos)", 

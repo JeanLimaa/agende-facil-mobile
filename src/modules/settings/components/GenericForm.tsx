@@ -17,7 +17,7 @@ export type FormDataType = Record<string, FieldValue>;
 export interface GenericFormField {
   name: string;
   label: string;
-  type: "text" | "number" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area" | "header" | "weekly-schedule";
+  type: "text" | "number" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area" | "header" | "weekly-schedule" | "informativeMessage";
   placeholder?: string;
   options?: { label: string; value: string }[];
   onChange?: (value: FieldValue, allValues: FormDataType) => void;
@@ -197,6 +197,14 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
           );
         }
 
+        if (field.type === "informativeMessage") {
+          return (
+            <Text key={field.name} style={styles.informativeMessage}>
+              {fieldLabel}
+            </Text>
+          );
+        }
+
         if (field.type === "weekly-schedule") {
           return (
             <WeeklyScheduleField
@@ -268,6 +276,11 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 18,
     fontWeight: "bold",
+    marginBottom: 10,
+  },
+  informativeMessage: {
+    fontSize: 14,
+    color: Colors.light.textSecondary,
     marginBottom: 10,
   },
 });
