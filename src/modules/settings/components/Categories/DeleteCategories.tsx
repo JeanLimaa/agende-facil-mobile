@@ -3,6 +3,7 @@ import { View, Text, Alert } from 'react-native';
 import { useCategoriesAndServices, useCategoryById } from '@/shared/hooks/queries/useCategoriesAndServices';
 import api from '@/shared/services/apiService';
 import { useRoute } from '@react-navigation/native';
+import { router } from "expo-router";
 import { Loading } from '@/shared/components/Loading';
 import ErrorScreen from '@/app/ErrorScreen';
 import { useApiErrorHandler } from '@/shared/hooks/useApiErrorHandler';
@@ -11,6 +12,7 @@ import { Category } from '@/modules/appointments/types/category.interface';
 import { Button } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { useConfirm } from '@/shared/hooks/useConfirm';
+import { AppBarHeader } from '@/shared/components/AppBarHeader';
 
 export function DeleteCategories() {
     const { confirm: confirmDelete, ConfirmDialogComponent: ConfirmDeleteDialogComponent } = useConfirm();
@@ -76,6 +78,8 @@ export function DeleteCategories() {
                 text2: 'Categoria excluída com sucesso.'
             });
             refetchCategories();
+
+            router.back();
         } catch (error) {
             handleApiError(error);
         }
@@ -83,6 +87,8 @@ export function DeleteCategories() {
 
     return (
         <View>
+            <AppBarHeader message="Excluir Categoria" />
+            
             <Text>
                 Selecione a nova categoria para substituir a categoria <Text style={{ fontWeight: 'bold' }}>{categorySelected.name}</Text>:
             </Text>
