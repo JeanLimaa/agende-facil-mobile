@@ -71,8 +71,8 @@ export default function CategoriesScreen() {
 
   return (
     <View style={{ flex: 1 }}>
-      <AppBarHeader message="Profissionais" />
-      
+      <AppBarHeader message="Categorias" />
+
       <FlatList
         data={categories}
         keyExtractor={(item) => String(item.id)}
@@ -104,7 +104,7 @@ export default function CategoriesScreen() {
       <ActionsModal
         visible={actionsModalVisible}
         onClose={() => setActionsModalVisible(false)}
-        title="Ações do Profissional"
+        title="Ações"
         options={[
           { 
             label: "Editar", 

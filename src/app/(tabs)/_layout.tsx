@@ -33,6 +33,7 @@ import SettingsPage from './settings';
 import { SettingsProfessionalTabs } from '@/modules/settings/components/Professional/SettingsProfessionalTab';
 import { AddOrEditCategory } from '@/modules/settings/components/Categories/AddOrEditCategory';
 import DeleteCategories from '@/modules/settings/components/Categories/DeleteCategories';
+import { AddOrEditService } from '@/modules/settings/components/Services/AddOrEditService';
 
 const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
 
@@ -67,6 +68,8 @@ function StackNavigator() {
       
       <Stack.Screen name="settings/security/change-password" component={ChangePasswordScreen} />
       <Stack.Screen name="settings/security/deactivate-account" component={DeactivateAccountScreen} />
+
+      <Stack.Screen name="settings/records/services/service-form" component={AddOrEditService} />
     </Stack.Navigator>
   );
 }

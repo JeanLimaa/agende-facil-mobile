@@ -12,7 +12,7 @@ import { useSettingsTabs } from "../contexts/SettingTabsContext";
 import WeeklyScheduleField from "@/shared/components/WeeklyScheduleField";
 
 export type FieldValue = string | number | boolean | Date | null | object | Array<any>;
-export type FormDataType = Record<string, FieldValue>;
+export type FormDataType = Record<string, any>;
 
 export interface GenericFormField {
   name: string;
