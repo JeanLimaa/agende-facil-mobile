@@ -5,6 +5,8 @@ import { Service } from '@/shared/types/service.interface';
 
 export const categoriesAndServicesQueryKey = 'categories-services';
 export const categoryByIdQueryKey: (id: number | null) => [string, number] = (id: number | null) => ['category', id || 0];
+export const serviceByIdQueryKey: (id: number | null) => [string, number] = (id: number | null) => ['service', id || 0];
+
 interface Result {
   categories: Category[];
   services: Service[];
@@ -16,7 +18,7 @@ export function useCategoriesAndServices(enabled: boolean, showSpecialCategories
     queryFn: async () => {
       const [categoriesRes, servicesRes] = await Promise.all([
         api.get<Category[]>('/category/list-all'),
-        api.get<Service[]>('/service/list-all')
+        api.get<Service[]>('/services')
       ]);
       
       const categoriesData = [...categoriesRes.data];
@@ -42,6 +44,17 @@ export function useCategoryById(id: number | null) {
     enabled: !!id,
     queryFn: async () => {
       const response = await api.get(`/category/${id}`);
+      return response.data;
+    },
+  });
+}
+
+export function useServiceById(id: number | null) {
+  return useQuery<Service>({
+    queryKey: serviceByIdQueryKey(id),
+    enabled: !!id,
+    queryFn: async () => {
+      const response = await api.get(`/service/${id}`);
       return response.data;
     },
   });
