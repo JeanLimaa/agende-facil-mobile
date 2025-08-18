@@ -40,12 +40,12 @@ export function SettingsProfessionalTabs() {
             method={employeeId ? "PUT" : "POST"}
             tabs={[
                 {
-                    key: "professional-profile",
+                    key: "profile",
                     title: "Perfil",
                     tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
                     content:
                         <GenericForm
-                            tabKey="professional-profile"
+                            tabKey="profile"
                             fields={[
                                 { name: "name", label: "Nome", type: "text", required: true},
                                 { name: "phone", label: "Telefone", type: "tel" },
@@ -66,12 +66,12 @@ export function SettingsProfessionalTabs() {
                         />
                 },
                 {
-                    key: "professional-hours",
+                    key: "workingHours",
                     title: "Horários",
                     tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
                     content: 
                     <GenericForm
-                        tabKey="professional-hours"
+                        tabKey="workingHours"
                         fields={[
                             {
                                 name: "informativeMessage",

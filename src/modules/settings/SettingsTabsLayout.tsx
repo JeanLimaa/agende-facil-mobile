@@ -10,7 +10,7 @@ import { AxiosError } from "axios";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
 import { useQueryClient } from "@tanstack/react-query";
 import { fabStyle } from "@/shared/styles/fab";
-import { removeEmptyFields } from "@/shared/helpers/removeEmptyFields";
+import { removeEmptyFields, removeEmptyObjects } from "@/shared/helpers/removeEmptyFields";
 import { SettingsTabsProvider, useSettingsTabs } from "./contexts/SettingTabsContext";
 import { router } from "expo-router";
 
@@ -50,9 +50,9 @@ function SettingsTabsLayout({ tabs, headerTitle, endpoint, method }: SettingsTab
       }
       
       if (method === "POST") {
-        await api.post(endpoint, tabsData);
+        await api.post(endpoint, removeEmptyObjects(tabsData));
       } else if (method === "PUT") {
-        await api.put(endpoint, tabsData);
+        await api.put(endpoint, removeEmptyObjects(tabsData));
       }
 
       Toast.show({
