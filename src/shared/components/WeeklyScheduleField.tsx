@@ -6,7 +6,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { GenericalCard } from "./GenericalCard";
 import { Colors } from "../constants/Colors";
 import { FieldValue, FormDataType, GenericFormField } from "@/modules/settings/components/GenericForm";
-import { DailyWorkingHour } from "../types/company.types";
+import { DailyWorkingHour } from "../types/working-hours.interface";
 
 const weekdays = [
   { key: "sunday", label: "Domingo", dayOfWeek: 0 },
@@ -45,12 +45,12 @@ export default function WeeklyScheduleField({
   };
 
   const getScheduleByDay = (dayOfWeek: number) => {
-    return (currentSchedule || []).find((entry: any) => entry.dayOfWeek === dayOfWeek);
+    return (currentSchedule || []).find((entry: DailyWorkingHour) => entry.dayOfWeek === dayOfWeek);
   };
 
   const clearDay = (dayKey: string) => {
     const { dayOfWeek } = weekdays.find((d) => d.key === dayKey)!;
-    const updated = (currentSchedule || []).filter((entry: any) => entry.dayOfWeek !== dayOfWeek);
+    const updated = (currentSchedule || []).filter((entry: DailyWorkingHour) => entry.dayOfWeek !== dayOfWeek);
     handleChange(field.name, updated);
 
     setErrors((prev) => {
@@ -118,7 +118,7 @@ export default function WeeklyScheduleField({
   };
 
   const hasAnySchedule = (currentSchedule || []).some(
-    (entry: any) => entry?.start || entry?.end
+    (entry: DailyWorkingHour) => entry?.startTime || entry?.endTime
   );
 
   const renderSummary = () => {
@@ -130,16 +130,26 @@ export default function WeeklyScheduleField({
       );
     }
 
-    return weekdays.map((day) => {
-      const schedule = getScheduleByDay(day.dayOfWeek);
-      if (!schedule?.startTime && !schedule?.endTime) return null;
+    return (
+      <View style={{ flexDirection: "column", gap: 6 }}>
+        {weekdays.map((day) => {
+          const schedule = getScheduleByDay(day.dayOfWeek);
+          if (!schedule?.startTime && !schedule?.endTime) return null;
 
-      return (
-        <Text key={day.key}>
-          {day.label}: {schedule?.startTime || "--:--"} às {schedule?.endTime || "--:--"}
-        </Text>
-      );
-    });
+          return (
+            <View
+              key={day.key}
+              style={styles.summaryRow}
+            >
+              <Text style={styles.summaryLabel}>{day.label}</Text>
+              <Text style={styles.summaryTime}>
+                {schedule?.startTime || "--:--"} às {schedule?.endTime || "--:--"}
+              </Text>
+            </View>
+          );
+        })}
+      </View>
+    );
   };
 
   return (
@@ -227,5 +237,13 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     marginBottom: 6,
-  }
+  },
+  summaryRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 2,
+  },
+  summaryLabel: { fontWeight: "500", flex: 1 },
+  summaryTime: { color: "#333", fontSize: 14 },
 });

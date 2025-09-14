@@ -1,6 +1,6 @@
-import { employeeByIdQueryKey, employeesQueryKey, useEmployee } from "@/shared/hooks/queries/useEmployees";
+import { employeeByIdQueryKey, employeesQueryKey, useEmployee, useServicesAttendedByProfessional } from "@/shared/hooks/queries/useEmployees";
 import { SettingsTabs } from "../../SettingsTabsLayout";
-import { GenericForm } from "../GenericForm";
+import { FieldValue, GenericForm } from "../GenericForm";
 import { useRoute } from "@react-navigation/native";
 import { useState } from "react";
 
@@ -11,7 +11,8 @@ export function SettingsProfessionalTabs() {
     const { employeeId } = route.params as { employeeId: number | null };
 
     const { data: employeeData } = useEmployee(employeeId);
-    
+    const { data: employeeServicesData } = useServicesAttendedByProfessional(employeeId);
+
     function formatServiceInterval(value: string) {
         if (!value) {
             setServiceIntervalPlaceholder("");
@@ -83,12 +84,13 @@ export function SettingsProfessionalTabs() {
                                 label: "Intervalo entre atendimentos (em minutos)", 
                                 type: "number", 
                                 placeholder: serviceIntervalPlaceholder,
-                                onChange: (value) => formatServiceInterval(value)
+                                onChange: (value) => formatServiceInterval(value as string)
                             },
                             { name: "workingHours", label: "Horários de trabalho", type: "weekly-schedule",}
                         ]}
+                        initialValues={employeeData}
                     />
-                }
+                },
             ]}
         />
     )

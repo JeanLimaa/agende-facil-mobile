@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/shared/services/apiService';
-import { Employee } from '@/shared/types/employee.interface';
+import { Employee, EmployeeService } from '@/shared/types/employee.interface';
 
 export const employeesQueryKey = 'employees';
 export const employeeByIdQueryKey: (id: number | null) => [string, number] = (id: number | null) => ['employee', id || 0];
@@ -21,6 +21,19 @@ export function useEmployee(employeeId: number | null) {
     enabled: !!employeeId,
     queryFn: async () => {
       const { data } = await api.get(`/employee/${employeeId}`);
+      return data;
+    },
+  });
+}
+
+export const servicesByProfessionalQueryKey = (employeeId: number | null) => ['services', employeeId];
+
+export function useServicesAttendedByProfessional(employeeId: number | null) {
+  return useQuery<EmployeeService[]>({
+    queryKey: servicesByProfessionalQueryKey(employeeId),
+    enabled: !!employeeId,
+    queryFn: async () => {
+      const { data } = await api.get(`/employee/${employeeId}/services`);
       return data;
     },
   });
