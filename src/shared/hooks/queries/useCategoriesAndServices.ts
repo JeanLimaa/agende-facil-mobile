@@ -17,17 +17,19 @@ export function useCategoriesAndServices(enabled: boolean, showSpecialCategories
     queryKey: [categoriesAndServicesQueryKey],
     queryFn: async () => {
       const [categoriesRes, servicesRes] = await Promise.all([
-        api.get<Category[]>('/category/list-all'),
+        api.get<Category[]>('/category'),
         api.get<Service[]>('/services')
       ]);
       
-      const categoriesData = [...categoriesRes.data];
+      const categoriesData = [];
       
       if (showSpecialCategories) {
         const allCategories = { id: 0, name: 'Todas' };
         const selectedCategories = { id: -1, name: 'Selecionados' };
         categoriesData.push(allCategories, selectedCategories);
       }
+
+      categoriesData.push(...categoriesRes.data);
 
       return {
         categories: categoriesData,
