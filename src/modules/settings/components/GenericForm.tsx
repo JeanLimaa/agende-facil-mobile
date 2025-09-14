@@ -3,6 +3,7 @@ import {
   View, 
   Text, 
   StyleSheet,
+  Switch,
 } from "react-native";
 import { Checkbox, Menu, TextInput, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -17,9 +18,9 @@ export type FormDataType = Record<string, any>;
 export interface GenericFormField {
   name: string;
   label: string;
-  type: "text" | "number" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area" | "header" | "weekly-schedule" | "informativeMessage";
+  type: "switch" | "text" | "number" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area" | "header" | "weekly-schedule" | "informativeMessage" | "currency" | "switchList";
   placeholder?: string;
-  options?: { label: string; value: string }[];
+  options?: { label: string; value: string | boolean }[];
   onChange?: (value: FieldValue, allValues: FormDataType) => void;
   required?: boolean;
 }
@@ -176,7 +177,7 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
               >
                 {field.options.map((option) => (
                   <Menu.Item
-                    key={option.value}
+                    key={String(option.value)}
                     onPress={() => {
                       handleChange(field.name, option.value);
                       setMenuVisible(null);
@@ -214,6 +215,75 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
               formData={formData}
               handleChange={handleChange}
             />
+          );
+        }
+
+        if (field.type === "currency") {
+          const formatCurrency = (value: string): string => {
+            // Remove tudo que não é número
+            const onlyNumbers = value.replace(/\D/g, '');
+            if (!onlyNumbers) return '';
+
+            // Converte para centavos
+            const intValue = parseInt(onlyNumbers, 10);
+            const formatted = (intValue / 100).toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL',
+            });
+
+            return formatted;
+          };
+
+          return (
+            <View key={field.name}>
+              <TextInput
+                label={fieldLabel}
+                style={styles.input}
+                outlineColor={Colors.light.mainColor}
+                value={formatCurrency(formData[field.name]?.toString() || '')}
+                onChangeText={text => {
+                  const formatted = formatCurrency(text);
+                  handleChange(field.name, formatted);
+                }}
+                keyboardType="numeric"
+              />
+            </View>
+          );
+        }
+
+        if(field.type === "switch") {
+          return (
+            <View key={field.name}>
+              <Text>{fieldLabel}</Text>
+              <Switch
+                value={formData[field.name] || false}
+                onValueChange={value => handleChange(field.name, value)}
+              />
+            </View>
+          );
+        }
+
+        if (field.type === "switchList") {
+          return (
+            <View key={field.name} style={{ gap: 10 }}>
+
+              {field.options?.map((data, index) => (
+                <View
+                key={index}
+                style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}
+                >
+                <Text style={styles.label}>{data.label}</Text>
+                  <Switch
+                    value={typeof data.value === "boolean" ? data.value : false}
+                    onValueChange={value => {
+                      const updated = [...formData[field.name]];
+                      updated[index] = { ...data, value };
+                      handleChange(field.name, updated);
+                    }}
+                  />
+                </View>
+              ))}
+            </View>
           );
         }
 
