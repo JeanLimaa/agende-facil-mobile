@@ -15,6 +15,7 @@ export interface Employee {
   profileImageUrl?: string;
   workingHours: WorkingHours[];
   employeeServices: Omit<EmployeeService, 'id' | 'employeeId' | 'serviceId'>[];
+  displayOnline?: boolean;
 }
 
 export interface EmployeeService {

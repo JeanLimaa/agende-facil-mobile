@@ -1,8 +1,11 @@
 import { employeeByIdQueryKey, employeesQueryKey, useEmployee, useServicesAttendedByProfessional } from "@/shared/hooks/queries/useEmployees";
 import { SettingsTabs } from "../../SettingsTabsLayout";
-import { FieldValue, GenericForm } from "../GenericForm";
+import { GenericForm } from "../GenericForm";
 import { useRoute } from "@react-navigation/native";
 import { useState } from "react";
+import { Loading } from "@/shared/components/Loading";
+import ErrorScreen from "@/app/ErrorScreen";
+import { ServicesSelector } from "./ServicesSelector";
 
 export function SettingsProfessionalTabs() {
     const [serviceIntervalPlaceholder, setServiceIntervalPlaceholder] = useState("");
@@ -10,8 +13,12 @@ export function SettingsProfessionalTabs() {
     const route = useRoute();
     const { employeeId } = route.params as { employeeId: number | null };
 
-    const { data: employeeData } = useEmployee(employeeId);
-    const { data: employeeServicesData } = useServicesAttendedByProfessional(employeeId);
+    const { 
+        data: employeeData, isLoading, error, refetch 
+    } = useEmployee(employeeId);
+
+    if(isLoading) return <Loading />;
+    if(error) return <ErrorScreen onRetry={refetch} message="Erro ao carregar dados" />;
 
     function formatServiceInterval(value: string) {
         if (!value) {
@@ -33,7 +40,7 @@ export function SettingsProfessionalTabs() {
         const formattedInterval = `${days > 0 ? `${days} dias, ` : ""}${hours > 0 ? `${hours} horas, ` : ""}${minutes} minutos`;
         setServiceIntervalPlaceholder(formattedInterval);
     }
-
+    
     return (
         <SettingsTabs
             headerTitle={employeeData?.name || "Novo profissional"}
@@ -63,7 +70,7 @@ export function SettingsProfessionalTabs() {
                                     placeholder: "Habilitar para que o profissional apareça nas opções de agendamento online."
                                 }
                             ]}
-                            initialValues={employeeData}
+                            initialValues={{...employeeData, displayOnline: employeeId ? employeeData?.displayOnline : true}}
                         />
                 },
                 {
@@ -91,6 +98,11 @@ export function SettingsProfessionalTabs() {
                         initialValues={employeeData}
                     />
                 },
+                {
+                    key: "employeeDataServices",
+                    title: "Serviços",
+                    content: <ServicesSelector employeeServicesData={employeeData?.employeeServices} tabsDataKey="employeeDataServices" />
+                }
             ]}
         />
     )
