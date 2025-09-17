@@ -7,6 +7,8 @@ import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
 import { ServicesSelector } from "./ServicesSelector";
 
+export const professionalTabKeys = ["profile", "workingHours", "employeeServices"] as const;
+
 export function SettingsProfessionalTabs() {
     const [serviceIntervalPlaceholder, setServiceIntervalPlaceholder] = useState("");
 
@@ -48,12 +50,12 @@ export function SettingsProfessionalTabs() {
             method={employeeId ? "PUT" : "POST"}
             tabs={[
                 {
-                    key: "profile",
+                    key: professionalTabKeys[0],
                     title: "Perfil",
                     tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
                     content:
                         <GenericForm
-                            tabKey="profile"
+                            tabKey={professionalTabKeys[0]}
                             fields={[
                                 { name: "name", label: "Nome", type: "text", required: true},
                                 { name: "phone", label: "Telefone", type: "tel" },
@@ -74,12 +76,12 @@ export function SettingsProfessionalTabs() {
                         />
                 },
                 {
-                    key: "workingHours",
+                    key: professionalTabKeys[1],
                     title: "Horários",
                     tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
                     content: 
                     <GenericForm
-                        tabKey="workingHours"
+                        tabKey={professionalTabKeys[1]}
                         fields={[
                             {
                                 name: "informativeMessage",
@@ -99,9 +101,10 @@ export function SettingsProfessionalTabs() {
                     />
                 },
                 {
-                    key: "employeeDataServices",
+                    key: professionalTabKeys[2],
                     title: "Serviços",
-                    content: <ServicesSelector employeeServicesData={employeeData?.employeeServices} tabsDataKey="employeeDataServices" />
+                    tanstackCacheKeys: [employeesQueryKey, employeeByIdQueryKey(employeeId)],
+                    content: <ServicesSelector employeeServicesData={employeeData?.employeeServices} tabsDataKey={professionalTabKeys[2]} />
                 }
             ]}
         />
