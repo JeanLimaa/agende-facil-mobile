@@ -12,7 +12,7 @@ interface Result {
   services: Service[];
 }
 
-export function useCategoriesAndServices(enabled: boolean, showSpecialCategories = true) {
+export function useCategoriesAndServices(enabled: boolean, showAllCategories = true, showSelectedCategory = false) {
   return useQuery<Result>({
     queryKey: [categoriesAndServicesQueryKey],
     queryFn: async () => {
@@ -22,11 +22,15 @@ export function useCategoriesAndServices(enabled: boolean, showSpecialCategories
       ]);
       
       const categoriesData = [];
-      
-      if (showSpecialCategories) {
+
+      if (showAllCategories) {
         const allCategories = { id: 0, name: 'Todas' };
+        categoriesData.push(allCategories);
+      }
+
+      if (showSelectedCategory) {
         const selectedCategories = { id: -1, name: 'Selecionados' };
-        categoriesData.push(allCategories, selectedCategories);
+        categoriesData.push(selectedCategories);
       }
 
       categoriesData.push(...categoriesRes.data);

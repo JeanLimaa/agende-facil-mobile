@@ -42,7 +42,7 @@ export function AppointmentForm({ appointmentEditId }: { appointmentEditId?: str
 
   // Requisições
   const { data: employeesData, isLoading: isLoadingEmployees } = useEmployees();
-  const { data: categoriesServicesData, isLoading: isLoadingCategoriesServices } = useCategoriesAndServices(true);
+  const { data: categoriesServicesData, isLoading: isLoadingCategoriesServices } = useCategoriesAndServices(true, true, true);
   const { data: editItemData, isLoading: isLoadingEdit } = useAppointmentEdit(appointmentEditId);
 
   const services = categoriesServicesData?.services || [];
