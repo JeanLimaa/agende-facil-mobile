@@ -11,6 +11,7 @@ import * as ImagePicker from "expo-image-picker";
 import { Colors } from "@/shared/constants/Colors";
 import { useSettingsTabs } from "../contexts/SettingTabsContext";
 import WeeklyScheduleField from "@/shared/components/WeeklyScheduleField";
+import { formatToCurrency } from "@/shared/helpers/formatValue.helper";
 
 export type FieldValue = string | number | boolean | Date | null | object | Array<any>;
 export type FormDataType = Record<string, any>;
@@ -20,7 +21,7 @@ export interface GenericFormField {
   label: string;
   type: "switch" | "text" | "number" | "email" | "tel" | "date" | "file" | "select" | "checkbox" | "text-area" | "header" | "weekly-schedule" | "informativeMessage" | "currency" | "switchList";
   placeholder?: string;
-  options?: { label: string; value: string | boolean }[];
+  options?: { label: string; value: string | boolean | number }[];
   onChange?: (value: FieldValue, allValues: FormDataType) => void;
   required?: boolean;
 }
@@ -58,7 +59,7 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
   const handleChange = (name: string, value: FieldValue) => {
     const fieldObj = fields.find(field => field.name === name);
     let parsedValue: FieldValue = value;
-
+    
     if (fieldObj?.type === "number" && typeof value === "string") {
       const onlyNumbers = value.replace(/[^0-9]/g, '');
       parsedValue =  Number(onlyNumbers);
@@ -219,20 +220,14 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
         }
 
         if (field.type === "currency") {
-          const formatCurrency = (value: string): string => {
-            // Remove tudo que não é número
-            const onlyNumbers = value.replace(/\D/g, '');
-            if (!onlyNumbers) return '';
-
-            // Converte para centavos
-            const intValue = parseInt(onlyNumbers, 10);
-            const formatted = (intValue / 100).toLocaleString('pt-BR', {
-              style: 'currency',
-              currency: 'BRL',
-            });
-
-            return formatted;
+          const formatCurrency = (value: number): string => {
+            return formatToCurrency(value); // exibe "R$ 10,00"
           };
+
+          const parseCurrency = (text: string): number => {
+            const onlyNumbers = text.replace(/\D/g, ''); // remove tudo que não é dígito
+            return onlyNumbers ? parseFloat(onlyNumbers) / 100 : 0; // converte para número real
+          }
 
           return (
             <View key={field.name}>
@@ -240,10 +235,13 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
                 label={fieldLabel}
                 style={styles.input}
                 outlineColor={Colors.light.mainColor}
-                value={formatCurrency(formData[field.name]?.toString() || '')}
+                value={
+                  formData[field.name] !== undefined && formData[field.name] !== null
+                    ? formatCurrency(Number(formData[field.name]))
+                    : ""
+                }
                 onChangeText={text => {
-                  const formatted = formatCurrency(text);
-                  handleChange(field.name, formatted);
+                  handleChange(field.name, parseCurrency(text));
                 }}
                 keyboardType="numeric"
               />

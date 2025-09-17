@@ -60,7 +60,7 @@ export function useServiceById(id: number | null) {
     queryKey: serviceByIdQueryKey(id),
     enabled: !!id,
     queryFn: async () => {
-      const response = await api.get(`/service/${id}`);
+      const response = await api.get(`/services/${id}`);
       return response.data;
     },
   });

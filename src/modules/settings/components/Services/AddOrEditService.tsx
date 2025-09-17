@@ -1,22 +1,50 @@
 import { SettingsTabs } from "../../SettingsTabsLayout";
 import { GenericForm } from "../GenericForm";
 import { useRoute } from "@react-navigation/native";
-import { categoriesAndServicesQueryKey, serviceByIdQueryKey, useServiceById } from "@/shared/hooks/queries/useCategoriesAndServices";
+import { categoriesAndServicesQueryKey, serviceByIdQueryKey, useCategoriesAndServices, useServiceById } from "@/shared/hooks/queries/useCategoriesAndServices";
+import { Loading } from "@/shared/components/Loading";
+import ErrorScreen from "@/app/ErrorScreen";
+import { useMemo } from "react";
+
+export const addOrEditServicesKeys = ["details", "pricing"] as const;
 
 export function AddOrEditService() {
     const route = useRoute();
     const { serviceId } = route.params as { serviceId: number | null };
 
-    const { data: serviceData } = useServiceById(serviceId);
+    const { data: serviceData, error: serviceError, isLoading: serviceLoading, refetch: serviceRefetch } = useServiceById(serviceId);
+    const { data: categoriesData, error: categoriesError, isLoading: categoriesLoading, refetch: categoriesRefetch } = useCategoriesAndServices(true, false);
+
+    const formattedCategories = useMemo(() => {
+        return categoriesData?.categories?.map(category => ({
+            label: category.name,
+            value: category.id
+        })) || [];
+    }, [categoriesData]);
+
+    const populatedCategory = useMemo(() => {
+        return formattedCategories.find(option => option.value === serviceData?.categoryId) || formattedCategories[0];
+    }, [formattedCategories, serviceData]);
+
+    if (serviceLoading || categoriesLoading) {
+        return <Loading />;
+    }
+
+    if (serviceError || categoriesError) {
+        return <ErrorScreen onRetry={() => {
+            serviceRefetch();
+            categoriesRefetch();
+        }} />;
+    }
 
     return (
         <SettingsTabs
             headerTitle={serviceData?.name || "Novo serviço"}
-            endpoint={serviceId ? `service/${serviceId}` : "service"}
+            endpoint={serviceId ? `services/${serviceId}` : "services"}
             method={serviceId ? "PUT" : "POST"}
             tabs={[
                 {
-                    key: "service-details",
+                    key: addOrEditServicesKeys[0],
                     title: "Serviço",
                     tanstackCacheKeys: [
                         categoriesAndServicesQueryKey,
@@ -24,18 +52,24 @@ export function AddOrEditService() {
                     ],
                     content:
                         <GenericForm
-                            tabKey="service-details"
+                            tabKey={addOrEditServicesKeys[0]}
                             fields={[
                                 { name: "name", label: "Nome", type: "text", required: true },
                                 { name: "description", label: "Descrição", type: "text" },
-                                { name: "duration", label: "Duração", type: "number", placeholder: "Duração em minutos" },
+                                { name: "duration", label: "Duração do serviço", type: "number", placeholder: "Duração em minutos" },
+                                {
+                                    name: "categoryId",
+                                    label: "Categoria",
+                                    type: "select",
+                                    options: formattedCategories
+                                },
                                 { name: "image", label: "Imagem", type: "file" },
                             ]}
-                            initialValues={serviceData}
+                            initialValues={{ ...serviceData, categoryId: populatedCategory.value }}
                         />
-                }, 
+                },
                 {
-                    key: "service-pricing",
+                    key: addOrEditServicesKeys[1],
                     title: "Preço",
                     tanstackCacheKeys: [
                         categoriesAndServicesQueryKey,
@@ -43,27 +77,11 @@ export function AddOrEditService() {
                     ],
                     content:
                         <GenericForm
-                            tabKey="service-pricing"
+                            tabKey={addOrEditServicesKeys[1]}
                             fields={[
-                                { name: "price", label: "Preço", type: "number", required: true }
+                                { name: "price", label: "Preço", type: "currency", required: true }
                             ]}
-                            initialValues={serviceData ? serviceData : {price: 0}}
-                        />
-                },
-                {
-                    key: "service-professionals",
-                    title: "Profissionais",
-                    tanstackCacheKeys: [
-                        categoriesAndServicesQueryKey,
-                        serviceByIdQueryKey(serviceId)
-                    ],
-                    content:
-                        <GenericForm
-                            tabKey="service-professionals"
-                            fields={[
-                                { name: "schedule", label: "Agendamento", type: "weekly-schedule", required: true }
-                            ]}
-                            initialValues={serviceData}
+                            initialValues={serviceData ? serviceData : { price: 0 }}
                         />
                 }
             ]}
