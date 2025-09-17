@@ -13,6 +13,7 @@ import { Button } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { useConfirm } from '@/shared/hooks/useConfirm';
 import { AppBarHeader } from '@/shared/components/AppBarHeader';
+import { Colors } from '@/shared/constants/Colors';
 
 export function DeleteCategories() {
     const { confirm: confirmDelete, ConfirmDialogComponent: ConfirmDeleteDialogComponent } = useConfirm();
@@ -90,6 +91,8 @@ export function DeleteCategories() {
         }
     };
 
+    const deleteButtonDisabled = hasOnlyOneCategory || !moveAppointmentsToCategoryId;
+
     return (
         <>
             <AppBarHeader message="Excluir Categoria" />
@@ -107,7 +110,7 @@ export function DeleteCategories() {
 
                 <Button
                     onPress={() => setModalVisible(true)}
-                    mode="outlined"
+                    mode="contained"
                     style={styles.selectButton}
                     disabled={hasOnlyOneCategory}
                 >
@@ -119,8 +122,8 @@ export function DeleteCategories() {
                 <Button
                     mode='contained'
                     onPress={handleMoveServices}
-                    disabled={hasOnlyOneCategory || !moveAppointmentsToCategoryId}
-                    style={styles.deleteButton}
+                    disabled={deleteButtonDisabled}
+                    style={!deleteButtonDisabled ? styles.deleteButton : styles.disabledButton}
                 >
                     Deletar Categoria
                 </Button>
@@ -161,9 +164,15 @@ const styles = StyleSheet.create({
     },
     selectButton: {
         marginBottom: 16,
+        backgroundColor: Colors.light.mainColor
     },
     deleteButton: {
         marginTop: 8,
+        backgroundColor: Colors.light.error,
+    },
+    disabledButton: {
+        marginTop: 8,
+        backgroundColor: Colors.light.backgroundSecondary,
     }
 });
 
