@@ -28,7 +28,6 @@ import ProfessionalsScreen from "./settings/records/professionals";
 import CategoriesScreen from "./settings/records/categories";
 import ServicesScreen from "./settings/records/services";
 import ChangePasswordScreen from "./settings/security/change-password";
-import DeactivateAccountScreen from "./settings/security/deactivate-account";
 import SettingsPage from './settings';
 import { SettingsProfessionalTabs } from '@/modules/settings/components/Professional/SettingsProfessionalTab';
 import { AddOrEditCategory } from '@/modules/settings/components/Categories/AddOrEditCategory';
@@ -67,7 +66,6 @@ function StackNavigator() {
       <Stack.Screen name="settings/records/services" component={ServicesScreen} />
       
       <Stack.Screen name="settings/security/change-password" component={ChangePasswordScreen} />
-      <Stack.Screen name="settings/security/deactivate-account" component={DeactivateAccountScreen} />
 
       <Stack.Screen name="settings/records/services/service-form" component={AddOrEditService} />
     </Stack.Navigator>

@@ -51,11 +51,6 @@ export function SettingsScreen() {
             icon: "lock-reset",
             onPress: () => router.push("/(tabs)/settings/security/change-password"),
           },
-          {
-            label: "Desativar Conta",
-            icon: "account-off-outline",
-            onPress: () => router.push("/(tabs)/settings/security/deactivate-account"),
-          },
         ]}
       />
 
