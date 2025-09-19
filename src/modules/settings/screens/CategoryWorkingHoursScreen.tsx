@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView } from "react-native";
+import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
@@ -47,7 +47,7 @@ export default function CategoryWorkingHoursScreen() {
     try {
       setLoading(true);
       const response = await api.get(`/employee-category-working-hours/employee/${employeeId}`);
-      
+
       setCategoryWorkingHours(response.data);
     } catch (error) {
       handleApiError(error);
@@ -67,7 +67,7 @@ export default function CategoryWorkingHoursScreen() {
     try {
       setLoading(true);
 
-      if(!employeeId || !selectedCategory) {
+      if (!employeeId || !selectedCategory) {
         Toast.show({
           type: 'error',
           text1: 'Erro',
@@ -149,17 +149,15 @@ export default function CategoryWorkingHoursScreen() {
   if (!employee) return <ErrorScreen message="Funcionário não encontrado" onRetry={() => router.back()} />;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <AppBarHeader message={`Horários por Categoria - ${employee.name}`} />
 
-      <ScrollView style={{ flex: 1, padding: 16 }}>
-        <Text style={{
-          fontSize: 16,
-          marginBottom: 16,
-          color: Colors.light.textSecondary,
-          textAlign: 'center'
-        }}>
+      <ScrollView style={styles.scrollView}>
+        <Text style={styles.infoText}>
           Configure horários específicos para cada categoria. Se não configurado, o funcionário usará seus horários padrão.
+        </Text>
+        <Text style={styles.infoText}>
+          A configuração de horários por categoria tem prioridade sobre os horários padrão do funcionário.
         </Text>
 
         {categories.map((category: Category) => {
@@ -167,18 +165,13 @@ export default function CategoryWorkingHoursScreen() {
           const hasHours = categoryHours.length > 0;
 
           return (
-            <Card key={category.id} style={{ marginBottom: 12 }}>
+            <Card key={category.id} style={styles.card}>
               <Card.Content>
-                <View style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginBottom: hasHours ? 12 : 0
-                }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold', flex: 1 }}>
+                <View style={styles.cardHeader}>
+                  <Text style={styles.categoryTitle}>
                     {category.name}
                   </Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={styles.actionsContainer}>
                     <IconButton
                       icon="pencil"
                       size={20}
@@ -196,19 +189,19 @@ export default function CategoryWorkingHoursScreen() {
                 </View>
 
                 {hasHours ? (
-                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  <View style={styles.hoursContainer}>
                     {categoryHours.map((hour, index) => (
                       <Chip
                         key={index}
                         mode="outlined"
-                        style={{ backgroundColor: '#E8F5E8' }}
+                        style={styles.hourChip}
                       >
                         {getDayName(hour.dayOfWeek)}: {hour.startTime}-{hour.endTime}
                       </Chip>
                     ))}
                   </View>
                 ) : (
-                  <Text style={{ color: Colors.light.textSecondary, fontStyle: 'italic' }}>
+                  <Text style={styles.defaultHoursText}>
                     Usando horários padrão do funcionário
                   </Text>
                 )}
@@ -231,3 +224,49 @@ export default function CategoryWorkingHoursScreen() {
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { 
+    flex: 1 
+  },
+  scrollView: { 
+    flex: 1, 
+    padding: 16 
+  },
+  infoText: {
+    fontSize: 14,
+    marginBottom: 16,
+    color: Colors.light.textSecondary,
+    textAlign: 'center'
+  },
+  card: { 
+    marginBottom: 12 
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12
+  },
+  categoryTitle: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    flex: 1 
+  },
+  actionsContainer: { 
+    flexDirection: 'row', 
+    alignItems: 'center' 
+  },
+  hoursContainer: { 
+    flexDirection: 'row', 
+    flexWrap: 'wrap', 
+    gap: 8 
+  },
+  hourChip: { 
+    backgroundColor: '#E8F5E8' 
+  },
+  defaultHoursText: { 
+    color: Colors.light.textSecondary, 
+    fontStyle: 'italic' 
+  }
+})
