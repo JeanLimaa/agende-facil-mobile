@@ -7,6 +7,7 @@ import { Card, Chip, IconButton } from "react-native-paper";
 import { router } from "expo-router";
 import { useCategoriesAndServices } from "@/shared/hooks/queries/useCategoriesAndServices";
 import { useEmployees } from "@/shared/hooks/queries/useEmployees";
+import { useCompany } from "@/shared/hooks/queries/useCompany";
 import Toast from "react-native-toast-message";
 import api from "@/shared/services/apiService";
 import { useApiErrorHandler } from "@/shared/hooks/useApiErrorHandler";
@@ -27,6 +28,7 @@ export default function CategoryWorkingHoursScreen() {
     error: categoriesError
   } = useCategoriesAndServices(true, false, false);
   const { data: employees, isLoading: loadingEmployees } = useEmployees();
+  const { data: companyData, isLoading: loadingCompany } = useCompany();
   const [categoryWorkingHours, setCategoryWorkingHours] = useState<CategoryWorkingHour[]>([]);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -144,7 +146,7 @@ export default function CategoryWorkingHoursScreen() {
     return days[dayOfWeek];
   };
 
-  if (loadingCategories || loadingEmployees) return <Loading />;
+  if (loadingCategories || loadingEmployees || loadingCompany) return <Loading />;
   if (categoriesError) return <ErrorScreen message="Erro ao carregar categorias" onRetry={() => { }} />;
   if (!employee) return <ErrorScreen message="Funcionário não encontrado" onRetry={() => router.back()} />;
 
@@ -218,6 +220,8 @@ export default function CategoryWorkingHoursScreen() {
         initialHours={selectedCategoryHours}
         onSave={handleSaveHours}
         loading={loading}
+        employee={employee}
+        companyWorkingHours={companyData?.schedule}
       />
 
       {ConfirmDialogComponent}
