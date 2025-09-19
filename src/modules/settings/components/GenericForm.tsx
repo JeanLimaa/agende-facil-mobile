@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { 
   View, 
   Text, 
@@ -44,9 +44,12 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
 
   const { setTabData } = useSettingsTabs();
 
+  const didInitialize = useRef(false);
+  
   useEffect(() => {
-    if (initialValues) {
+    if (initialValues && !didInitialize.current) {
       setFormData(initialValues);
+      didInitialize.current = true;
     }
   }, [initialValues]);
 
