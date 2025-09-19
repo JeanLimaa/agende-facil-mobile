@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { View, Text, Pressable, StyleSheet, Alert } from "react-native";
 import { Button, Chip, HelperText } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -75,7 +75,10 @@ export default function WeeklyScheduleField({
     currentTime: Date;
   }>({ dayKey: "", type: "startTime", show: false, currentTime: new Date() });
 
-  const currentSchedule = (formData[field.name] as DailyWorkingHour[]) || [];
+  const currentSchedule = useMemo(() => {
+    return (formData[field.name] as DailyWorkingHour[]) || [];
+  }, [formData, field.name]);
+
 
   // Função para obter horário atual de um dia específico
   const getScheduleByDay = (dayOfWeek: number): DailyWorkingHour | undefined => {
@@ -113,8 +116,12 @@ export default function WeeklyScheduleField({
       }
     });
 
-    setErrors(newErrors);
+    // evita loop se não mudou nada
+    if (JSON.stringify(newErrors) !== JSON.stringify(errors)) {
+      setErrors(newErrors);
+    }
   }, [currentSchedule]);
+
 
   const showPicker = (dayKey: string, type: "startTime" | "endTime") => {
     const day = weekdays.find(d => d.key === dayKey);
