@@ -33,6 +33,7 @@ import { SettingsProfessionalTabs } from '@/modules/settings/components/Professi
 import { AddOrEditCategory } from '@/modules/settings/components/Categories/AddOrEditCategory';
 import DeleteCategories from '@/modules/settings/components/Categories/DeleteCategories';
 import { AddOrEditService } from '@/modules/settings/components/Services/AddOrEditService';
+import CategoryWorkingHoursScreen from '@/modules/settings/screens/CategoryWorkingHoursScreen';
 
 const SubscriptionPage = () => <View><Text>Subscription Screen</Text></View>;
 
@@ -68,6 +69,8 @@ function StackNavigator() {
       <Stack.Screen name="settings/security/change-password" component={ChangePasswordScreen} />
 
       <Stack.Screen name="settings/records/services/service-form" component={AddOrEditService} />
+
+      <Stack.Screen name='settings/records/professionals/category-working-hours' component={CategoryWorkingHoursScreen} />
     </Stack.Navigator>
   );
 }

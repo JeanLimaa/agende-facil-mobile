@@ -56,6 +56,21 @@ export default function ProfessionalsScreen() {
     navigation.navigate("settings/records/professionals/professional-form", { employeeId });
   }
 
+  function handleCategoryWorkingHours(employeeId: number | null) {
+    if(!employeeId) {
+      Toast.show({
+        type: 'error',
+        text1: 'Erro',
+        text2: 'Nenhum profissional selecionado.'
+      });
+      return;
+    }
+    
+    cleanActions();
+
+    navigation.navigate("settings/records/professionals/category-working-hours", { employeeId });
+  }
+
   async function handleDeleteEmployee(employeeId: number | null) {
     if(!employeeId) {
       Toast.show({
@@ -127,6 +142,12 @@ export default function ProfessionalsScreen() {
             action: () => handleEditEmployee(selectedEmployee), 
             icon: { name: "edit", family: "MaterialIcons" }, 
             color: "#1E88E5" 
+          },
+          { 
+            label: "Horários por Categoria", 
+            action: () => handleCategoryWorkingHours(selectedEmployee), 
+            icon: { name: "schedule", family: "MaterialIcons" }, 
+            color: "#43A047" 
           },
           { 
             label: "Excluir", 
