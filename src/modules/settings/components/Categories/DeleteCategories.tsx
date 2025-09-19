@@ -8,7 +8,7 @@ import { Loading } from '@/shared/components/Loading';
 import ErrorScreen from '@/app/ErrorScreen';
 import { useApiErrorHandler } from '@/shared/hooks/useApiErrorHandler';
 import { SelectableListModal } from '@/shared/components/SelectableListModal';
-import { Category } from '@/modules/appointments/types/category.interface';
+import { Category } from '@/shared/types/category.interface';
 import { Button } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { useConfirm } from '@/shared/hooks/useConfirm';

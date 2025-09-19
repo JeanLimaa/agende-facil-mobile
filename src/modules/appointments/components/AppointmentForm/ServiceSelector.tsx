@@ -2,7 +2,7 @@ import { View, Text, ScrollView } from "react-native";
 import { Chip, Checkbox, Divider } from "react-native-paper";
 import { appointmentFormStyle as styles } from "../../styles/styles";
 import { Service } from "@/shared/types/service.interface";
-import { Category } from "../../types/category.interface";
+import { Category } from "@/shared/types/category.interface";
 import { formatToCurrency } from "@/shared/helpers/formatValue.helper";
 import { textCapitalize } from "@/shared/helpers/textCapitalize.helper";
 import { useMemo } from "react";

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/shared/services/apiService';
-import { Category } from '../../../modules/appointments/types/category.interface';
+import { Category } from '@/shared/types/category.interface';
 import { Service } from '@/shared/types/service.interface';
 
 export const categoriesAndServicesQueryKey = 'categories-services';
