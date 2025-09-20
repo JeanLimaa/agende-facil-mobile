@@ -12,6 +12,8 @@ import { Colors } from "@/shared/constants/Colors";
 import { useSettingsTabs } from "../contexts/SettingTabsContext";
 import WeeklyScheduleField from "@/shared/components/WeeklyScheduleField";
 import { formatToCurrency } from "@/shared/helpers/formatValue.helper";
+import { Employee } from "@/shared/types/employee.interface";
+import { CompanyWorkingHours } from "@/shared/types/company.types";
 
 export type FieldValue = string | number | boolean | Date | null | object | Array<any>;
 export type FormDataType = Record<string, any>;
@@ -24,6 +26,16 @@ export interface GenericFormField {
   options?: { label: string; value: string | boolean | number }[];
   onChange?: (value: FieldValue, allValues: FormDataType) => void;
   required?: boolean;
+
+  // Propriedades específicas para o weekly-schedule com modal
+  weeklyScheduleProps?: {
+    employee?: Employee;
+    companyWorkingHours?: CompanyWorkingHours;
+    type: "company" | "employee";
+    useModal?: boolean;
+    modalTitle?: string;
+    modalSubtitle?: string;
+  }
 }
 
 interface GenericFormProps {
@@ -218,6 +230,12 @@ export const GenericForm = ({ fields, initialValues, onChange, tabKey }: Generic
               field={field}
               formData={formData}
               handleChange={handleChange}
+              useModal={field?.weeklyScheduleProps?.useModal}
+              modalTitle={field?.weeklyScheduleProps?.modalTitle}
+              modalSubtitle={field?.weeklyScheduleProps?.modalSubtitle}
+              employee={field?.weeklyScheduleProps?.employee}
+              companyWorkingHours={field?.weeklyScheduleProps?.companyWorkingHours}
+              type={field?.weeklyScheduleProps?.type ?? "company"}
             />
           );
         }

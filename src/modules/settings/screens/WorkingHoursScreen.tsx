@@ -43,7 +43,13 @@ export default function WorkingHoursScreen() {
                   type: "weekly-schedule",
                   name: "workingHours",
                   label: "Horários de Trabalho",
-                  placeholder: "Defina os horários de trabalho para cada dia da semana"
+                  placeholder: "Defina os horários de trabalho para cada dia da semana",
+                  weeklyScheduleProps: {
+                    useModal: true,
+                    modalTitle: "Horários de Funcionamento",
+                    modalSubtitle: "Empresa",
+                    type: "company"
+                  }
                 }
               ]}
             />

@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
 import { ServicesSelector } from "./ServicesSelector";
+import { useCompany } from "@/shared/hooks/queries/useCompany";
 
 export const professionalTabKeys = ["profile", "workingHours", "employeeServices"] as const;
 
@@ -18,6 +19,8 @@ export function SettingsProfessionalTabs() {
     const { 
         data: employeeData, isLoading, error, refetch 
     } = useEmployee(employeeId);
+
+    const { data: companyData } = useCompany();
 
     if(isLoading) return <Loading />;
     if(error) return <ErrorScreen onRetry={refetch} message="Erro ao carregar dados" />;
@@ -95,7 +98,19 @@ export function SettingsProfessionalTabs() {
                                 placeholder: serviceIntervalPlaceholder,
                                 onChange: (value) => formatServiceInterval(value as string)
                             },
-                            { name: "workingHours", label: "Horários de trabalho", type: "weekly-schedule",}
+                            { 
+                                name: "workingHours", 
+                                label: "Horários de trabalho", 
+                                type: "weekly-schedule",
+                                weeklyScheduleProps: {
+                                    useModal: true,
+                                    modalTitle: "Configurar Horários",
+                                    modalSubtitle: employeeData?.name,
+                                    employee: employeeData,
+                                    companyWorkingHours: companyData?.schedule,
+                                    type: "employee"
+                                }
+                            }
                         ]}
                         initialValues={employeeData}
                     />
