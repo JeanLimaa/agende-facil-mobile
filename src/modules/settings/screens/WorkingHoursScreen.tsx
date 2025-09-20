@@ -4,6 +4,7 @@ import { GenericForm } from "../components/GenericForm";
 import { companyInfoQueryKey, useCompany } from "@/shared/hooks/queries/useCompany";
 import { Loading } from "@/shared/components/Loading";
 import ErrorScreen from "@/app/ErrorScreen";
+import { employeesQueryKey } from "@/shared/hooks/queries/useEmployees";
 
 export default function WorkingHoursScreen() {
   const {data, refetch, error, isLoading} = useCompany();
@@ -22,7 +23,7 @@ export default function WorkingHoursScreen() {
         {
           key: "working-hours",
           title: "Horários de Funcionamento",
-          tanstackCacheKeys: [companyInfoQueryKey],
+          tanstackCacheKeys: [companyInfoQueryKey, employeesQueryKey],
           content: 
             <GenericForm
               tabKey="working-hours"

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, StyleSheet } from "react-native";
 import { AppBarHeader } from "@/shared/components/AppBarHeader";
 import { Loading } from "@/shared/components/Loading";
@@ -6,7 +6,7 @@ import ErrorScreen from "@/app/ErrorScreen";
 import { Card, Chip, IconButton } from "react-native-paper";
 import { router } from "expo-router";
 import { useCategoriesAndServices } from "@/shared/hooks/queries/useCategoriesAndServices";
-import { useEmployees } from "@/shared/hooks/queries/useEmployees";
+import { employeeCategoryWorkingHourByIdQueryKey, useEmployeeCategoryWorkingHour, useEmployees } from "@/shared/hooks/queries/useEmployees";
 import { useCompany } from "@/shared/hooks/queries/useCompany";
 import Toast from "react-native-toast-message";
 import api from "@/shared/services/apiService";
@@ -17,6 +17,7 @@ import { useRoute } from "@react-navigation/native";
 import { useConfirm } from "@/shared/hooks/useConfirm";
 import { Category, CategoryWorkingHour } from "@/shared/types/category.interface";
 import { DailyWorkingHour } from "@/shared/types/working-hours.interface";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function CategoryWorkingHoursScreen() {
   const route = useRoute();
@@ -25,38 +26,45 @@ export default function CategoryWorkingHoursScreen() {
   const {
     data: categoriesAndServices,
     isLoading: loadingCategories,
-    error: categoriesError
+    error: categoriesError,
+    refetch: refetchCategories
   } = useCategoriesAndServices(true, false, false);
-  const { data: employees, isLoading: loadingEmployees } = useEmployees();
-  const { data: companyData, isLoading: loadingCompany } = useCompany();
-  const [categoryWorkingHours, setCategoryWorkingHours] = useState<CategoryWorkingHour[]>([]);
+  const { 
+    data: employees, 
+    isLoading: loadingEmployees, 
+    error: employeesError, 
+    refetch: refetchEmployees 
+  } = useEmployees();
+  const { 
+    data: companyData, 
+    isLoading: loadingCompany, 
+    error: companyError, 
+    refetch: refetchCompany 
+  } = useCompany();
+  const { 
+    data: categoryWorkingHoursData, 
+    isLoading: loadingCategoryWorkingHours, 
+    error: categoryWorkingHoursError, 
+    refetch: refetchCategoryWorkingHours 
+  } = useEmployeeCategoryWorkingHour(employeeId);
   const [loading, setLoading] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [selectedCategoryHours, setSelectedCategoryHours] = useState<CategoryWorkingHour[]>([]);
   const handleApiError = useApiErrorHandler();
+  const queryClient = useQueryClient();
+
+  const refetchAll = () => {
+    refetchCategories();
+    refetchEmployees();
+    refetchCompany();
+    refetchCategoryWorkingHours();
+  }
 
   const employee = employees?.find(emp => emp.id === employeeId);
   const categories = categoriesAndServices?.categories || [];
+  const categoryWorkingHours = categoryWorkingHoursData || [];
 
-  useEffect(() => {
-    if (employeeId) {
-      loadCategoryWorkingHours();
-    }
-  }, [employeeId]);
-
-  const loadCategoryWorkingHours = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get(`/employee-category-working-hours/employee/${employeeId}`);
-
-      setCategoryWorkingHours(response.data);
-    } catch (error) {
-      handleApiError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleAddCategoryHours = (category: Category) => {
     const existingHours = categoryWorkingHours.filter(h => h.categoryId === category.id);
@@ -102,7 +110,7 @@ export default function CategoryWorkingHoursScreen() {
         text2: 'Horários salvos com sucesso!'
       });
 
-      loadCategoryWorkingHours();
+      queryClient.invalidateQueries({ queryKey: employeeCategoryWorkingHourByIdQueryKey(employeeId) });
       setModalVisible(false);
     } catch (error) {
       handleApiError(error);
@@ -129,7 +137,8 @@ export default function CategoryWorkingHoursScreen() {
         text1: 'Sucesso',
         text2: 'Horários excluídos com sucesso!'
       });
-      loadCategoryWorkingHours();
+      
+      queryClient.invalidateQueries({ queryKey: employeeCategoryWorkingHourByIdQueryKey(employeeId) });
     } catch (error) {
       handleApiError(error);
     } finally {
@@ -146,8 +155,8 @@ export default function CategoryWorkingHoursScreen() {
     return days[dayOfWeek];
   };
 
-  if (loadingCategories || loadingEmployees || loadingCompany) return <Loading />;
-  if (categoriesError) return <ErrorScreen message="Erro ao carregar categorias" onRetry={() => { }} />;
+  if (loadingCategories || loadingEmployees || loadingCompany || loadingCategoryWorkingHours) return <Loading />;
+  if (categoriesError || employeesError || companyError || categoryWorkingHoursError) return <ErrorScreen message="Erro ao carregar dados" onRetry={refetchAll} />;
   if (!employee) return <ErrorScreen message="Funcionário não encontrado" onRetry={() => router.back()} />;
 
   return (
