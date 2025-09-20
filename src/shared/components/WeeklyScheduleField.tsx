@@ -8,6 +8,7 @@ import { Colors } from "../constants/Colors";
 import { FieldValue, FormDataType, GenericFormField } from "@/modules/settings/components/GenericForm";
 import { DailyWorkingHour } from "../types/working-hours.interface";
 import { useConfirm } from "../hooks/useConfirm";
+import { WorkingHoursModal } from "./WorkingHoursModal/WorkingHoursModal";
 
 const weekdays = [
   { key: "sunday", label: "Domingo", dayOfWeek: 0 },
@@ -34,6 +35,12 @@ interface WeeklyScheduleFieldProps {
   formData: FormDataType;
   fieldLabel: string;
   handleChange: (name: string, value: FieldValue) => void;
+  useModal?: boolean;
+  modalTitle?: string;
+  modalSubtitle?: string;
+  employee?: any;
+  companyWorkingHours?: any;
+  type: "company" | "employee" | "category";
 }
 
 interface ValidationError {
@@ -60,13 +67,21 @@ export default function WeeklyScheduleField({
   field,
   formData,
   fieldLabel,
-  handleChange
+  handleChange,
+  useModal = false,
+  modalTitle = "Configurar Horários",
+  modalSubtitle,
+  employee,
+  companyWorkingHours,
+  type
 }: WeeklyScheduleFieldProps) {
   const {
     confirm,
     ConfirmDialogComponent
   } = useConfirm();
   const [expanded, setExpanded] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [day: string]: ValidationError | null }>({});
   const [timePickerState, setTimePickerState] = useState<{
     dayKey: string;
@@ -237,6 +252,26 @@ export default function WeeklyScheduleField({
     handleChange(field.name, newSchedule);
   };
 
+  const handleModalSave = async (hours: DailyWorkingHour[]) => {
+    setLoading(true);
+    try {
+      handleChange(field.name, hours);
+      setModalVisible(false);
+    } catch (error) {
+      console.error('Erro ao salvar horários:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditClick = () => {
+    if (useModal) {
+      setModalVisible(true);
+    } else {
+      setExpanded((prev) => !prev);
+    }
+  };
+
   const hasAnySchedule = currentSchedule.some(
     (entry: DailyWorkingHour) => entry?.startTime || entry?.endTime
   );
@@ -333,11 +368,11 @@ export default function WeeklyScheduleField({
 
         <Button
           mode="text"
-          onPress={() => setExpanded((prev) => !prev)}
+          onPress={handleEditClick}
           style={{ marginTop: 8 }}
-          icon={expanded ? "chevron-up" : "chevron-down"}
+          icon={useModal ? "pencil" : (expanded ? "chevron-up" : "chevron-down")}
         >
-          {expanded ? "Fechar edição" : "Editar horários"}
+          {useModal ? "Editar horários" : (expanded ? "Fechar edição" : "Editar horários")}
         </Button>
       </View>
 
@@ -420,6 +455,21 @@ export default function WeeklyScheduleField({
           is24Hour
           display="default"
           onChange={handleTimeChange}
+        />
+      )}
+
+      {useModal && (
+        <WorkingHoursModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          title={modalTitle}
+          subtitle={modalSubtitle}
+          initialHours={currentSchedule}
+          onSave={handleModalSave}
+          loading={loading}
+          type={type}
+          employee={employee}
+          companyWorkingHours={companyWorkingHours}
         />
       )}
 
